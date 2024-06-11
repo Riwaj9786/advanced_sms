@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edu-Ikshya</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            display: flex;
+        }
+        .top-navbar {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 1030;
+        }
+        .side-navbar {
+            position: fixed;
+            top: 75px; /* Height of the top navbar */
+            bottom: 0;
+            width: 200px;
+            padding-top: 20px;
+            background-color: #343a40;
+            display: flex;
+            flex-direction: column;
+        }
+        .content {
+            margin-top: 75px; /* Height of the top navbar */
+            margin-left: 200px; /* Width of the side navbar */
+            padding: 20px;
+            width: calc(100% - 200px);
+        }
+        .nav-link {
+            font-weight: bold;
+        }
+        .nav-link:hover {
+            background-color: #067aef;
+        }
+    </style>
+</head>
+<body>
+    <!-- Top Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-primary top-navbar shadow-sm">
+        <a class="navbar-brand d-flex align-items-center" href="#">
+            <img src="{% static 'images/logo/edu-ikshya-logo.png' %}" alt="Edu-Ikshya Logo" width="65" height="65" class="d-inline-block align-top ml-5">
+        </a>
+        <div class="collapse navbar-collapse justify-content-end">
+            <ul class="navbar-nav">
+                <li class="nav-item">
+                    <a class="nav-link text-white" href="#">Student</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-white" href="#">Logout</a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Side Navbar -->
+    <div class="side-navbar">
+        <nav class="nav flex-column">
+            <a class="nav-link text-light p-4" href="#">Dashboard</a>
+            <a class="nav-link text-light p-4" href="#">Classes</a>
+            <a class="nav-link text-light p-4" href="#">Assignments</a>
+            <a class="nav-link text-light p-4" href="#">Marks</a>
+            <div class="mt-auto">
+                <a class="nav-link text-light p-4" href="#">Settings</a>
+            </div>
+        </nav>
+    </div>
+
+    <!-- Content -->
+    <div class="content bg-light">
+        <div class="container">
+            {% block student_dashboard %}
+            {% endblock %}
+        </div>
+    </div>
+
+    <!-- Bootstrap JS and dependencies -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>

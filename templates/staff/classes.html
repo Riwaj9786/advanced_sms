@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+
+{% extends 'staff/index.html' %}
+
+{% load static %}
+
+{% block classes %}
+<div class="container mt-5">
+    <div class="row">
+        {% for pc in program_courses %}
+            <div class="col-md-3 no-underline">
+                <a href="#">
+                    <div class="container color p-4 shadow">
+                        <p class="text-secondary">{{ pc.program }}</p>
+                        <h3>{{ pc.course }}</h3>
+                        <p class="text-secondary mt-3">Semester: {{ pc.semester }}</p>
+                    </div>
+                </a>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

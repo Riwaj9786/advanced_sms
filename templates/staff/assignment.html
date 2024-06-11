@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+{% extends 'staff/index.html' %}
+
+{% load static %}
+
+{% block assignment %}
+
+
+<div class="container-fluid col-md-6 mt-5 shadow p-4">
+    <h3 class="text-uppercase text-primary text-center py-3">
+        Assign a Assignment
+    </h3>
+    <form method="post">
+        {% csrf_token %}
+        <div class="mb-3 row">
+            <label class="col-sm-4 col-form-label font-weight-bold" for="id_title">Assignment Title:</label>
+            <div class="col-sm-12">
+                {{ form.title }}
+            </div>
+        </div>
+        <div class="mb-3 row">
+            <label class="col-sm-4 col-form-label font-weight-bold" for="id_description">Description:</label>
+            <div class="col-sm-12">
+                {{ form.description }}
+            </div>
+        </div>
+        <div class="mb-3 row">
+            <label class="col-sm-4 col-form-label font-weight-bold" for="id_deadline">Deadline:</label>
+            <div class="col-sm-12">
+                {{ form.deadline }}
+            </div>
+        </div>
+        <div class="mb-3 row">
+            <label class="col-sm-4 col-form-label font-weight-bold" for="id_worth">Worth:</label>
+            <div class="col-sm-12">
+                {{ form.worth }}
+            </div>
+        </div>
+        <div class="mb-3 row">
+            <label class="col-sm-4 col-form-label font-weight-bold" for="id_research_links">References:</label>
+            <div class="col-sm-12">
+                {{ form.research_links }}
+            </div>
+        </div>
+        <div class="mb-3 row">
+            <label class="col-sm-4 col-form-label font-weight-bold" for="id_accepted_file_type">File Type:</label>
+            <div class="col-sm-12">
+                {{ form.accepted_file_type }}
+            </div>
+        </div>
+        <div class="mb-3 row">
+            <label class="col-sm-4 col-form-label font-weight-bold" for="id_assigned_class">Class:</label>
+            <div class="col-sm-12">
+                {{ form.assigned_class }}
+            </div>
+        </div>
+        <div class="mb-3 row">
+            <div class="col-sm-12 justify-content-end">
+                <button type="submit" class="btn btn-primary">Submit</button>
+            </div>
+        </div>
+    </form>
+</div>
+{% endblock %}

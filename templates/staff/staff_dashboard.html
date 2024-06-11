@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+{% extends 'staff/index.html' %}
+
+{% load static %}
+
+{% block staff_dashboard %}
+
+<div class="container mt-3">
+    <div class="card shadow-lg" style="width: 100%;">
+        <div class="card-body">
+            <div class="row align-items-center">
+                <div class="col-md-4 text-center">
+                    <div class="rounded-circle bg-success d-flex justify-content-center align-items-center" style="width: 200px; height: 200px;">
+                        <p class="text-white display-4">{{ user.first_name|slice:":1" }}{{ user.last_name|slice:":1" }}</p>
+                    </div>
+                </div>
+                <div class="col-md-5">
+                    <div class="container">
+                        <h6 class="text-secondary">Hello!</h6>
+                        <h1 class="text-primary">{{ user.first_name }} {{ user.last_name }}</h4>
+                    </div>
+                </div>               
+                <div class="col-md-3">
+                    <div class="container">
+                        <h6 class="text-secondary">Status</h6>
+                        <h5 class="text-success">
+                            {% if user.is_superuser %}
+                                Super Admin
+                            {% elif user.is_staff %}
+                                Teacher
+                            {% else %}
+                                Student
+                            {% endif %}
+                        </h5>  
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="d-flex {% if user.is_superuser %} justify-content-center {% else %} justify-content-start {% endif %} mt-4">
+        <div class="card text-white mx-3 bg-primary shadow-lg" style="width: 18rem;">
+            <div class="card-body text-center">
+                <h5 class="card-title">{% if user.is_superuser %} Total {% endif %}Students</h5>
+                <h1 class="display-4 font-weight-bold">{{student_count}}</h1>
+            </div>
+        </div>
+        <div class="card text-white mx-3 bg-success shadow-lg" style="width: 18rem;">
+            <div class="card-body text-center">
+                <h5 class="card-title">{% if user.is_superuser %} Total {% endif %}Classes</h5>
+                <h1 class="display-4 font-weight-bold">{{pc_count}}</h1>
+            </div>
+        </div>
+        {% if user.is_superuser %}
+        <div class="card text-white mx-3 bg-primary shadow-lg" style="width: 18rem;">
+            <div class="card-body text-center">
+                <h5 class="card-title">Total Users</h5>
+                <h1 class="display-4 font-weight-bold">{{user_count}}</h1>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+</div>
+
+{% endblock %}

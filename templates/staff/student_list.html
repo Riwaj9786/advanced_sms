@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+{% extends 'staff/index.html' %}
+
+{% load static %}
+
+{% block student_list %}
+<div class="container-fluid mt-5">
+    <div class="container">
+        <div class="bg-light p-4 rounded shadow-sm mb-4">
+            <form class="row g-3" method="GET">
+                {% csrf_token %}
+                <div class="col-md-3">
+                    <select class="form-select" style="min-width: 200px;" id="inputGroupSelect03" name="course">
+                        <option selected>Program...</option>
+                        {% for program in programs %}
+                            <option value="{{ program }}">{{ program }}</option>
+                        {% endfor %}
+                    </select>
+                </div>                
+                <div class="col-md-3 ml-4">
+                    <select class="form-select" style="min-width: 200px;" id="inputGroupSelect03" name="course">
+                        <option selected>Semester...</option>
+                        {% for semester in semesters %}
+                            <option value="{{ semester }}">{{ semester }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <select class="form-select" style="min-width: 200px;" id="inputGroupSelect03" name="course">
+                        <option selected>Course...</option>
+                        {% for course in courses %}
+                            <option value="{{ course }}">{{ course }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-2 d-flex align-items-end">
+                    <button type="submit" class="btn btn-sm btn-primary">Filter</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    {% for student in students %}
+    <div class="container mt-3">
+        <div class="card card-design shadow-sm mb-3 border-0">
+            <div class="card-body">
+                <div class="row align-items-center">
+                    <div class="col-md-4">
+                        <h5 class="mb-0 text-uppercase">{{ student.first_name }} {{ student.last_name }}</h5>
+                    </div>
+                    <div class="col-md-6">
+                        <p class="text-secondary mb-1"><strong>Program:</strong> {{ student.program.program_name }}</p>
+                        <p class="text-secondary mb-0"><strong>Semester:</strong> {{ student.semester.semester }}</p>
+                    </div>
+                    <div class="col-md-2 text-md-right d-flex justify-content-end">
+                        <a href="#" class="btn btn-primary rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                            &gt;
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}
