@@ -120,10 +120,10 @@ class Assignment(models.Model):
     research_links = models.JSONField(blank=True, null=True)  # This field can store a list of URLs
     accepted_file_type = models.CharField(max_length=10, choices=ACCEPTED_FILE_TYPES)
     assigned_class = models.ForeignKey(ProgramCourse, on_delete=models.CASCADE, related_name='assignments')
+    created_by = models.ForeignKey(User, null=True, on_delete=models.CASCADE)
 
     def __str__(self):
         return self.title
-
 
 
 # Model for Submission

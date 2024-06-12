@@ -2,7 +2,7 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.http import HttpResponse, HttpResponseForbidden
 from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth.decorators import login_required
-from student.models import Student, ProgramCourse, User, Program
+from student.models import Student, ProgramCourse, User, Program, Assignment
 from student.forms import RegisterForm, LoginForm, AssignmentForm
 from django.contrib.auth.hashers import make_password
 
@@ -152,6 +152,7 @@ def classes_view(request, pk):
 
 
 
+
 @login_required
 def assignments(request, pk):
     teacher = get_object_or_404(User, pk=pk)
@@ -160,10 +161,22 @@ def assignments(request, pk):
         return HttpResponseForbidden("You are not authorized!")
     
     program_courses = ProgramCourse.objects.filter(teacher=teacher)
-    form = AssignmentForm(teacher=teacher)
+    assignments = Assignment.objects.filter(assigned_class__teacher=teacher)
+
+    if request.method == 'POST':
+        form = AssignmentForm(request.POST, teacher=teacher)
+        if form.is_valid():
+            assignment = form.save(commit=False)
+            assignment.assigned_class = form.cleaned_data['assigned_class']
+            assignment.created_by = request.user  # Assign the current user as the creator
+            assignment.save()
+            return redirect('students:assignments', pk=teacher.pk)
+    else:
+        form = AssignmentForm(teacher=teacher)
 
     return render(request, 'staff/assignment.html', {
         'teacher': teacher,
         'program_courses': program_courses,
         'form': form,
+        'assignments': assignments
     })
