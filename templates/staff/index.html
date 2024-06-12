@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 {% load static %}
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -23,7 +24,8 @@
 
         .side-navbar {
             position: fixed;
-            top: 75px; /* Height of the top navbar */
+            top: 75px;
+            /* Height of the top navbar */
             bottom: 0;
             width: 200px;
             padding-top: 20px;
@@ -33,12 +35,79 @@
         }
 
         .content {
-            margin-top: 75px; /* Height of the top navbar */
-            margin-left: 200px; /* Width of the side navbar */
+            margin-top: 75px;
+            /* Height of the top navbar */
+            margin-left: 200px;
+            /* Width of the side navbar */
             padding: 20px;
             width: calc(100% - 200px);
         }
 
+        .navbar-toggler {
+            border: none;
+            /* Remove the border */
+        }
+
+        .no-underline{
+            text-decoration: none;
+        }
+
+        .navbar-toggler-icon {
+            background-color: #fff;
+            /* White background color */
+        }
+
+        @media (max-width: 992px) {
+            .side-navbar {
+                display: none;
+            }
+
+            .content {
+                margin-left: 0;
+                margin-top: 75px;
+                /* Adjust if needed for smaller screens */
+                width: 100%;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .content {
+                margin-top: 55px;
+            }
+
+            .navbar-toggler-icon {
+                background-color: #fff;
+                /* White background color */
+                border: none;
+                /* Remove border */
+                width: 1.5rem;
+                /* Adjust size */
+                height: 1.5rem;
+                /* Adjust size */
+            }
+
+            .navbar-nav.flex-row {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .navbar-nav.flex-row .nav-link {
+                padding: 1rem;
+            }
+
+            .profile-pic {
+                width: 35px;
+                height: 35px;
+                border-radius: 50%;
+                overflow: hidden;
+                margin-right: 1rem;
+            }
+
+            .profile-pic img {
+                width: 100%;
+                height: auto;
+            }
+        }
 
         .no-underline a {
             text-decoration: none;
@@ -47,26 +116,33 @@
         .no-underline a:hover {
             text-decoration: none;
         }
-        
-        .no-underline a:hover .color{
-            background-color: #cfe7ff;
-        }
     </style>
 </head>
+
 <body>
     <!-- Top Navbar -->
     <nav class="navbar navbar-expand-lg navbar-light bg-primary top-navbar shadow-sm">
         <a class="navbar-brand d-flex mx-5 align-items-center" href="{% url 'students:staff_dashboard' pk=user.pk %}">
-            <img class="img rounded-circle" src="{% static 'images/logo/eduikshya-logo.png' %}" alt="Edu-Ikshya Logo" width="65" height="65" class="d-inline-block align-top">
+            <img class="img rounded-circle" src="{% static 'images/logo/eduikshya-logo.png' %}" alt="Edu-Ikshya Logo"
+                width="65" height="65" class="d-inline-block align-top">
         </a>
-        <div class="collapse navbar-collapse justify-content-end">
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+            aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
             {% if user.is_authenticated %}
-            <ul class="navbar-nav">
-                <li class="nav-item">
-                    <p class="nav-link text-white mx-2 p-3">Welcome {{user}}</p>
+            <ul class="navbar-nav ms-auto d-none d-lg-flex">
+                <li class="nav-item d-flex align-items-center">
+                    <div class="profile-pic d-flex mx-4 align-items-center">
+                        <img style="width: 40px;" class="img rounded-circle mx-2"
+                            src="{% static 'images/profile/images.png' %}">
+                        <p class="text-xs text-white mb-0">Welcome, {{ user.first_name }}</p>
+                    </div>
                 </li>
+
                 <li class="nav-item">
-                    <a class="nav-link text-white mx-2 p-3" href="{% url 'students:logout' %}">Logout</a>
+                    <a class="nav-link text-white mx-2 p-2" href="{% url 'students:logout' %}">Logout</a>
                 </li>
             </ul>
             {% endif %}
@@ -74,15 +150,85 @@
     </nav>
 
     <!-- Side Navbar -->
-    <div class="side-navbar">
-        <nav class="nav mt-5 flex-column">
-            <a class="nav-link text-light p-4" href="{% url 'students:staff_dashboard' pk=user.pk %}">Dashboard</a>
-            <a class="nav-link text-light p-4" href="{% url 'students:student_lists' pk=user.pk %}">Students</a>
-            <a class="nav-link text-light p-4" href="{% url 'students:classes_view' pk=user.pk %}">Classes</a>
-            <a class="nav-link text-light p-4" href="{% url 'students:assignments' pk=user.pk %}">Assignments</a>
-            <a class="nav-link text-light p-4" href="#">Marks</a>
+    <div class="side-navbar d-none d-lg-flex">
+        <nav class="nav flex-column w-100">
+            <a class="nav-link text-light p-4" href="{% url 'students:staff_dashboard' pk=user.pk %}">
+                <i class="fas fa-tachometer-alt"></i> <span>Dashboard</span>
+            </a>
+            <a class="nav-link text-light p-4" href="{% url 'students:student_lists' pk=user.pk %}">
+                <i class="fas fa-user-graduate"></i> <span>Students</span>
+            </a>
+            <a class="nav-link text-light p-4" href="{% url 'students:classes_view' pk=user.pk %}">
+                <i class="fas fa-chalkboard-teacher"></i> <span>Classes</span>
+            </a>
+            <a class="nav-link text-light p-4" href="{% url 'students:assignments' pk=user.pk %}">
+                <i class="fas fa-tasks"></i> <span>Assignments</span>
+            </a>
+            <a class="nav-link text-light p-4" href="#">
+                <i class="fas fa-book"></i> <span>Marks</span>
+            </a>
             <div class="mt-auto">
-                <a class="nav-link text-light p-4" href="#">Settings</a>
+                <a class="nav-link text-light p-4" href="#">
+                    <i class="fas fa-cogs"></i> <span>Settings</span>
+                </a>
+            </div>
+        </nav>
+    </div>
+
+    <!-- Mobile Side Navbar -->
+    <div class="d-lg-none">
+        <nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow-sm">
+            <div class="container-fluid">
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mobileNavbar"
+                    aria-controls="mobileNavbar" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="mobileNavbar">
+                    <ul class="navbar-nav flex-row w-100 justify-content-around align-items-center">
+                        {% if user.is_authenticated %}
+                        <li class="nav-item text-center">
+                            <div class="profile-pic">
+                                <img src="{% static 'images/profile_pic.jpg' %}" alt="Profile Picture">
+                            </div>
+                        </li>
+                        <li class="nav-item text-center">
+                            <a class="nav-link text-light" href="{% url 'students:staff_dashboard' pk=user.pk %}">
+                                Dashboard
+                            </a>
+                        </li>
+                        <li class="nav-item text-center">
+                            <a class="nav-link text-light" href="{% url 'students:student_lists' pk=user.pk %}">
+                                Students
+                            </a>
+                        </li>
+                        <li class="nav-item text-center">
+                            <a class="nav-link text-light" href="{% url 'students:classes_view' pk=user.pk %}">
+                                Classes
+                            </a>
+                        </li>
+                        <li class="nav-item text-center">
+                            <a class="nav-link text-light" href="{% url 'students:assignments' pk=user.pk %}">
+                                Assignments
+                            </a>
+                        </li>
+                        <li class="nav-item text-center">
+                            <a class="nav-link text-light" href="#">
+                                Marks
+                            </a>
+                        </li>
+                        <li class="nav-item text-center">
+                            <a class="nav-link text-light" href="#">
+                                Settings
+                            </a>
+                        </li>
+                        <li class="nav-item text-center">
+                            <a class="nav-link text-light" href="{% url 'students:logout' %}">
+                                Logout
+                            </a>
+                        </li>
+                        {% endif %}
+                    </ul>
+                </div>
             </div>
         </nav>
     </div>
@@ -90,7 +236,6 @@
     <!-- Content -->
     <div class="content bg-light">
         <div class="container">
-
             {% block staff_dashboard %}
             {% endblock %}
 
@@ -103,13 +248,15 @@
             {% block assignment %}
             {% endblock %}
 
+            {% block student_detail %}
+            {% endblock %}
         </div>
     </div>
 
     <!-- Bootstrap JS and dependencies -->
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src=" https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.2/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
+
 </html>

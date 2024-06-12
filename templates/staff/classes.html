@@ -8,12 +8,12 @@
 <div class="container mt-5">
     <div class="row">
         {% for pc in program_courses %}
-            <div class="col-md-3 no-underline">
-                <a href="#">
-                    <div class="container color p-4 shadow">
+            <div class="col-12 col-sm-6 col-md-4 col-lg-3 mb-4 d-flex align-items-stretch">
+                <a href="#" class="text-decoration-none w-100">
+                    <div class="d-flex flex-column bg-white p-4 shadow h-100">
                         <p class="text-secondary">{{ pc.program }}</p>
                         <h3>{{ pc.course }}</h3>
-                        <p class="text-secondary mt-3">Semester: {{ pc.semester }}</p>
+                        <p class="text-secondary mt-auto">Semester: {{ pc.semester }}</p>
                     </div>
                 </a>
             </div>

@@ -116,7 +116,7 @@ PASSWORD_HASHERS = [
 
 
 
-SESSION_COOKIE_AGE = 30 * 60  # 30 minutes in seconds
+SESSION_COOKIE_AGE = 30*60  # 30 minutes in seconds
 SESSION_SAVE_EVERY_REQUEST = True  # Reset session timer on each request
 
 # Internationalization

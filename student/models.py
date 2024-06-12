@@ -32,7 +32,7 @@ class Semester(models.Model):
 
 
 class User(AbstractUser):
-    teacher_id = models.CharField(max_length=15, unique=True, editable=False)
+    user_id = models.CharField(max_length=15, unique=True, editable=False)
     address = models.CharField(max_length=150, null=True, blank=False)
     contact_number = models.CharField(max_length=20, blank=True, null=True)
     gender = models.CharField(max_length=1, choices=[('M', 'Male'), ('F', 'Female'), ('O', 'Other')])
@@ -40,8 +40,8 @@ class User(AbstractUser):
     is_student = models.BooleanField(default=False)
 
     def save(self, *args, **kwargs):
-        if not self.teacher_id:
-            self.teacher_id = str(uuid.uuid4())[:15]
+        if not self.user_id:
+            self.user_id = str(uuid.uuid4())[:15]
         super().save(*args, **kwargs)
 
     def __str__(self):

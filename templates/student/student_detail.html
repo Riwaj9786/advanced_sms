@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+{% extends 'staff/index.html' %}
+
+{% load static %}
+
+{% block student_detail %}
+<div class="container">
+    <a class="text-xs text-primary" href="{% url 'students:student_lists' pk=user.pk %}">&lt Return</a>
+</div>
+<div class="container mt-3">
+    <div class="card shadow-lg" style="width: 100%;">
+        <div class="card-body">
+            <div class="row align-items-center">
+                <div class="col-md-4 text-center">
+                    <div class="rounded-circle bg-success d-flex justify-content-center align-items-center" style="width: 200px; height: 200px;">
+                        <p class="text-white display-4">{{ student.first_name|slice:":1" }}{{ student.last_name|slice:":1" }}</p>
+                    </div>
+                </div>
+                <div class="col-md-5">
+                    <div class="container">
+                        <h1 class="text-primary">{{ student.first_name }} {{ student.last_name }}</h4>
+                        <p>{{ student.registration_number }}</p>
+                    </div>
+                </div>               
+                <div class="col-md-3">
+                    <div class="container">
+                        <h6 class="text-secondary">Status</h6>
+                        <h5 class="text-success">
+                            Student
+                        </h5>  
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

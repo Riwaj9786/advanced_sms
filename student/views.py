@@ -87,12 +87,10 @@ def staff_dashboard(request, pk):
     })
 
 
-
 @login_required
 def user_logout(request):
     logout(request)
     return redirect('students:home')
-
 
 
 @login_required
@@ -113,12 +111,8 @@ def student_lists(request, pk):
     students = Student.objects.filter(semester__programcourse__in=program_courses).distinct()
 
     # Apply filters if they are provided
-    if program:
-        students = students.filter(semester__programcourse__program__program_name=program)
     if course:
         students = students.filter(semester__programcourse__course__course_name=course)
-    if semester:
-        students = students.filter(semester__semester=semester)
 
     # Get distinct values for filters
     distinct_programs = program_courses.values_list('program__program_name', flat=True).distinct()
@@ -137,6 +131,12 @@ def student_lists(request, pk):
     return render(request, 'staff/student_list.html', context)
 
 
+@login_required
+def student_detail(request, pk):
+    student = get_object_or_404(Student, pk=pk)
+
+    return render(request, 'student/student_detail.html', {'student': student})
+
 
 @login_required
 def classes_view(request, pk):
@@ -149,8 +149,6 @@ def classes_view(request, pk):
     
     return render(request, 'staff/classes.html', {'teacher': teacher,
                                                   'program_courses': program_courses})
-
-
 
 
 @login_required
@@ -180,3 +178,11 @@ def assignments(request, pk):
         'form': form,
         'assignments': assignments
     })
+
+
+@login_required
+def delete_assignment(request, pk):
+    assignment = get_object_or_404(Assignment, pk=pk)
+    assignment.delete()
+
+    return redirect('students:assignments', pk=request.user.pk)

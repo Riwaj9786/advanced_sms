@@ -11,23 +11,7 @@
                 {% csrf_token %}
                 <div class="col-md-3">
                     <select class="form-select" style="min-width: 200px;" id="inputGroupSelect03" name="course">
-                        <option selected>Program...</option>
-                        {% for program in programs %}
-                            <option value="{{ program }}">{{ program }}</option>
-                        {% endfor %}
-                    </select>
-                </div>                
-                <div class="col-md-3 ml-4">
-                    <select class="form-select" style="min-width: 200px;" id="inputGroupSelect03" name="course">
-                        <option selected>Semester...</option>
-                        {% for semester in semesters %}
-                            <option value="{{ semester }}">{{ semester }}</option>
-                        {% endfor %}
-                    </select>
-                </div>
-                <div class="col-md-3">
-                    <select class="form-select" style="min-width: 200px;" id="inputGroupSelect03" name="course">
-                        <option selected>Course...</option>
+                        <option value="" selected>Course...</option>
                         {% for course in courses %}
                             <option value="{{ course }}">{{ course }}</option>
                         {% endfor %}
@@ -53,7 +37,7 @@
                         <p class="text-secondary mb-0"><strong>Semester:</strong> {{ student.semester.semester }}</p>
                     </div>
                     <div class="col-md-2 text-md-right d-flex justify-content-end">
-                        <a href="#" class="btn btn-primary rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                        <a href="{% url 'students:student_detail' pk=student.pk %}" class="btn btn-primary rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
                             &gt;
                         </a>
                     </div>
