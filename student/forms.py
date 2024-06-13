@@ -8,7 +8,7 @@ class RegisterForm(forms.ModelForm):
 
     class Meta:
         model = User
-        fields = ['username', 'email', 'first_name', 'last_name', 'password']
+        fields = ['username', 'email', 'first_name', 'last_name', 'password', 'is_student', 'date_of_birth']
 
     def clean(self):
         cleaned_data = super().clean()
@@ -43,19 +43,19 @@ class AssignmentForm(forms.ModelForm):
 
 
 class StudentRegistrationForm(UserCreationForm):
-    email_address = forms.CharField(max_length=30, required=True)
     date_of_birth = forms.DateField(required=True)
+    password = forms.CharField(widget=forms.PasswordInput)
+    password_confirm = forms.CharField(widget=forms.PasswordInput, label="Confirm Password")
 
     class Meta:
         model = User
-        fields = ['username', 'email', 'first_name', 'last_name', 'password']
+        fields = ['username', 'email', 'first_name', 'last_name']
 
     def clean(self):
         cleaned_data = super().clean()
-        registration_number = cleaned_data.get('registration_number')
         date_of_birth = cleaned_data.get('date_of_birth')
-        program = cleaned_data.get('program')
+        email = cleaned_data.get('email')
 
-        if not Student.objects.filter(registration_number=registration_number, date_of_birth=date_of_birth, program=program).exists():
+        if not Student.objects.filter(email=email, date_of_birth=date_of_birth).exists():
             raise forms.ValidationError("No student found with the provided details.")
         return cleaned_data

@@ -12,9 +12,13 @@ def home(request):
     if request.user.is_authenticated:
         if request.user.is_staff:
             return redirect('students:staff_dashboard', pk=request.user.pk)
-        # If you have other types of users, handle their redirection here
-        # elif request.user.is_some_other_type:
-        #     return redirect('some_other_dashboard', pk=request.user.pk)
+        
+        elif request.user.is_student:
+            return redirect('students:student_dashboard', pk=request.user.pk)
+        
+        else:
+            return HttpResponse('You are not Authenticated')
+
     
     if request.method == "POST":
         form = LoginForm(request.POST)
@@ -26,8 +30,11 @@ def home(request):
                 if user.is_staff:
                     login(request, user)
                     return redirect('students:staff_dashboard', pk=user.pk)
+                elif user.is_student:
+                    login(request, user)
+                    return redirect('students:student_dashboard', pk=user.pk)
                 else:
-                    form.add_error(None, "User is not a staff!")
+                    form.add_error(None, "User not Verified!")
             else:
                 form.add_error(None, "Invalid Username and Password!")
         else:
@@ -43,10 +50,35 @@ def user_register(request):
         form = RegisterForm(request.POST)
         if form.is_valid():
             user = form.save(commit=False)
+            email = form.cleaned_data.get('email')
+            date_of_birth = form.cleaned_data.get('date_of_birth')
+            is_student = form.cleaned_data.get('is_student')
             user.password = make_password(form.cleaned_data['password'])
-            user.save()
-            login(request, user)
-            return redirect('students:home')  # Redirect to the home page or another appropriate page
+
+            if is_student:
+                try:
+                    # Retrieve the student based on email and date of birth
+                    student = Student.objects.get(email=email, date_of_birth=date_of_birth)
+                    
+                    # Ensure the student is not already linked to a user
+                    if student.user:
+                        form.add_error(None, "This student is already linked to a user account.")
+                    else:
+                        user.is_student = True
+                        user.save()
+
+                        # Link the user to the student
+                        student.user = user
+                        student.save()
+                        return redirect('students:home')
+                    
+                except Student.DoesNotExist:
+                    form.add_error(None, "No student found with the provided details.")
+            else:
+                user.is_staff = True
+                user.save()
+
+                return redirect('students:home')
     else:
         form = RegisterForm()
 
@@ -85,6 +117,19 @@ def staff_dashboard(request, pk):
         'student_count': student_count,
         'pc_count': program_count,
     })
+
+
+
+@login_required
+def student_dashboard(request, pk):
+    student_user = get_object_or_404(User, pk=pk)
+    student = Student.objects.get(user=student_user)
+
+    if student_user != request.user:
+        return HttpResponseForbidden("You are not Authorized!")
+    
+    return render(request, 'student/student_dashboard.html', {'student': student,
+                                                              'user': student_user})
 
 
 @login_required

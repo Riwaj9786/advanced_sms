@@ -35,8 +35,9 @@ class User(AbstractUser):
     user_id = models.CharField(max_length=15, unique=True, editable=False)
     address = models.CharField(max_length=150, null=True, blank=False)
     contact_number = models.CharField(max_length=20, blank=True, null=True)
+    date_of_birth = models.DateField(null=True, blank=True)
     gender = models.CharField(max_length=1, choices=[('M', 'Male'), ('F', 'Female'), ('O', 'Other')])
-    is_staff = models.BooleanField(default=True)
+    is_staff = models.BooleanField(default=False)
     is_student = models.BooleanField(default=False)
 
     def save(self, *args, **kwargs):
@@ -61,6 +62,7 @@ class Student(models.Model):
     email = models.EmailField(blank=True, null=True)
     program = models.ForeignKey(Program, on_delete=models.CASCADE)
     semester = models.ForeignKey(Semester, on_delete=models.RESTRICT)
+    user = models.OneToOneField(User, on_delete=models.RESTRICT, null=True, blank=True)
 
     def __str__(self):
         return f"{self.first_name} {self.last_name}"
