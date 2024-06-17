@@ -5,13 +5,20 @@ app_name = 'students'
 
 urlpatterns = [
     path('', views.home, name='home'),
-    path('register/', views.user_register, name='user_register'),
-    path('staff/<pk>/', views.staff_dashboard, name='staff_dashboard'),
     path('logout/', views.user_logout, name='logout'),
-    path('students/<pk>/', views.student_lists, name='student_lists'),
-    path('classes/<pk>/', views.classes_view, name='classes_view'),
-    path('assignments/<pk>/', views.assignments, name='assignments'),
-    path('assignments/<pk>/delete/', views.delete_assignment, name='delete_assignment'),
+    path('register/', views.user_register, name='user_register'),
+    path('accounts/login/', views.session_expired, name='session_expired'),
+
+    # Views for Staff
+    path('staff/<pk>/', views.staff_dashboard, name='staff_dashboard'),
+    path('staff/students/<pk>/', views.student_lists, name='student_lists'),
+    path('staff/classes/<pk>/', views.classes_view, name='classes_view'),
+    path('staff/assignments/<pk>/', views.assignments, name='assignments'),
+    path('staff/assignments/<pk>/delete/', views.delete_assignment, name='delete_assignment'),
     path('staff/student/<pk>/', views.student_detail, name='student_detail'),
-    path('student/<pk>/', views.student_dashboard, name='student_dashboard'),
+
+    #Views for student
+    path('student/dashboard/<pk>/', views.student_dashboard, name='student_dashboard'),
+    path('student/assignments/', views.student_assignment_view, name="student_assignments"),
+    path('student/assignment/<pk>/', views.assignment_view, name="assignment_view"),
 ]

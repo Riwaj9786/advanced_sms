@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'student',
+    'ckeditor',
 ]
 
 MIDDLEWARE = [
@@ -116,7 +117,7 @@ PASSWORD_HASHERS = [
 
 
 
-SESSION_COOKIE_AGE = 30*60  # 30 minutes in seconds
+SESSION_COOKIE_AGE = 1800  # 30 minutes in seconds
 SESSION_SAVE_EVERY_REQUEST = True  # Reset session timer on each request
 
 # Internationalization
@@ -146,4 +147,3 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
 AUTH_USER_MODEL = 'student.User'
-

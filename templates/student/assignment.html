@@ -4,7 +4,55 @@
 {% load static %}
 
 {% block assignment %}
-<div class="container">
-    
+
+<div class="container mt-5">
+    {% if assignments %}
+        <div class="row">
+            {% for assignment in assignments %}
+            <div class="col-md-4 mb-4">
+                <a href="{% url 'students:assignment_view' pk=assignment.pk %}" class="text-decoration-none">
+                    <div class="card shadow-sm h-100" style="border-radius: 15px;">
+                        <div class="card-body">
+                            <h5 class="card-title text-uppercase text-primary fw-bold" style="font-family: 'Arial', sans-serif;">
+                                {{ assignment.title }}
+                            </h5>
+                            <p class="card-text text-secondary text-xs fw-light" style="font-family: 'Courier New', monospace;">
+                                {{ assignment.assigned_class.course }}
+                            </p>
+                            <div class="row my-3">
+                                <div class="col-sm-4">
+                                    <p class="card-text"><span class="small text-muted">Deadline:</span></p>
+                                </div>
+                                <div class="col-sm-8 text-end">
+                                    <p class="card-text">
+                                        <span class="h5 text-success">
+                                            {{ assignment.deadline|date:"d-F" }}
+                                        </span>
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-8">
+                                    <p class="card-text text-secondary">
+                                        <span class="small text-muted">Created By: {{ assignment.created_by }}</span>
+                                    </p>
+                                </div>
+                                <div class="col-sm-4">
+                                    <p class="card-text text-secondary text-end">
+                                        <span class="small text-muted">Worth: {% if assignment.worth %} {{ assignment.worth }} {% else %} 0 {% endif %}</span>
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="container mt-3 shadow">
+            <p class="text-sm text-center text-secondary">There are no assigned Assignments.</p>
+        </div>
+    {% endif %}
 </div>
 {% endblock %}

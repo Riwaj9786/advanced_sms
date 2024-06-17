@@ -231,3 +231,29 @@ def delete_assignment(request, pk):
     assignment.delete()
 
     return redirect('students:assignments', pk=request.user.pk)
+
+
+
+@login_required
+def student_assignment_view(request):
+    user = request.user
+
+    if user.is_student:
+        student = Student.objects.get(user=user)
+        
+        program_course = ProgramCourse.objects.filter(program=student.program, semester=student.semester)
+        assignments = Assignment.objects.filter(assigned_class__in=program_course).order_by('deadline')
+
+        return render(request, 'student/assignment.html', {'assignments':assignments})
+
+
+@login_required
+def assignment_view(request, pk):
+        assignment = get_object_or_404(Assignment, pk=pk)
+
+        return render(request, 'student/assignment_view.html', {'assignment': assignment})
+
+
+
+def session_expired(request):
+    return render(request, 'session_expire.html')

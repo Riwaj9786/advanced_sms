@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <title>Session Timed Out</title>
+    <style>
+        body {
+            background-color: #f7f9f9;
+        }
+        .container {
+            margin-top: 50px;
+        }
+        .alert {
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="alert alert-warning p-4 shadow-sm" role="alert">
+                    <h4 class="alert-heading">Session Timed Out</h4>
+                    <p>Your session has timed out due to inactivity. Please log in again to continue.</p>
+                    <hr>
+                    <p class="mb-3"><a href="{% url 'students:home' %}" class="btn btn-primary">Login Again</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
