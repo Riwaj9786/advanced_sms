@@ -141,6 +141,12 @@
                     </div>
                 </li>
 
+                {% if user.is_superuser %}
+                <li class="nav-item">
+                    <a class="nav-link text-white mx-2 p-2" href="{% url 'admin:index' %}">Your Portal</a>
+                </li>
+                {% endif %}
+
                 <li class="nav-item">
                     <a class="nav-link text-white mx-2 p-2" href="{% url 'students:logout' %}">Logout</a>
                 </li>

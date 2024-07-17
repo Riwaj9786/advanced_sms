@@ -7,22 +7,29 @@
 <div class="container-fluid mt-5">
     <div class="container">
         <div class="bg-light p-4 rounded shadow-sm mb-4">
-            <form class="row g-3" method="GET">
-                {% csrf_token %}
-                <div class="col-md-3">
-                    <select class="form-select" style="min-width: 200px;" id="inputGroupSelect03" name="course">
-                        <option value="" selected>Course...</option>
-                        {% for course in courses %}
-                            <option value="{{ course }}">{{ course }}</option>
-                        {% endfor %}
-                    </select>
-                </div>
+            <div class="row g-3">
+                <form class="col d-flex align-items-end" method="GET">
+                    {% csrf_token %}
+                    <div class="col-md-3">
+                        <select class="form-select" style="min-width: 200px;" id="inputGroupSelect03" name="course">
+                            <option value="" selected>Course...</option>
+                            {% for course in courses %}
+                                <option value="{{ course }}">{{ course }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-2 d-flex align-items-end">
+                        <button type="submit" class="btn btn-outline-primary">Filter</button>
+                    </div>
+                </form>
                 <div class="col-2 d-flex align-items-end">
-                    <button type="submit" class="btn btn-sm btn-primary">Filter</button>
+                    <button type="button" class="btn btn-xs btn-outline-secondary">&plus; Student</button>
                 </div>
-            </form>
+            </div>
         </div>
     </div>
+</div>
+
 
     {% for student in students %}
     <div class="container mt-3">
@@ -47,9 +54,5 @@
     </div>
     {% endfor %}
 </div>
-<div class="container-fluid">
-    <div class="flex col-md-12">
-        <button class="btn btn-xs btn-primary">&plus; Add Student</button>
-    </div>
-</div>
+
 {% endblock %}

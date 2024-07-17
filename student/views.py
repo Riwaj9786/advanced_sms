@@ -148,9 +148,7 @@ def student_lists(request, pk):
         return HttpResponseForbidden("You are not authorized!")
 
     # Get filter values from the request
-    program = request.GET.get('program')
     course = request.GET.get('course')
-    semester = request.GET.get('semester')
 
     # Base queryset for students
     students = Student.objects.filter(semester__programcourse__in=program_courses).distinct()
