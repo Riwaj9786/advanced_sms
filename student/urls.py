@@ -16,6 +16,8 @@ urlpatterns = [
     path('staff/assignments/<pk>/', views.assignments, name='assignments'),
     path('staff/assignments/<pk>/delete/', views.delete_assignment, name='delete_assignment'),
     path('staff/student/<pk>/', views.student_detail, name='student_detail'),
+    path('staff/assignments/<pk>/submissions/', views.submission_view, name='submission_view'),
+    path('marks/<int:course_id>/<int:semester_id>/', views.marks_page, name='marks_page'),
 
     #Views for student
     path('student/dashboard/<pk>/', views.student_dashboard, name='student_dashboard'),

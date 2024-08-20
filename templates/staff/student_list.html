@@ -6,11 +6,12 @@
 {% block student_list %}
 <div class="container-fluid mt-5">
     <div class="container">
+        <!-- Filter and Add Student Section -->
         <div class="bg-light p-4 rounded shadow-sm mb-4">
             <div class="row g-3">
-                <form class="col d-flex align-items-end" method="GET">
+                <form class="col-md-8 d-flex align-items-center" method="GET">
                     {% csrf_token %}
-                    <div class="col-md-3">
+                    <div class="col-md-4">
                         <select class="form-select" style="min-width: 200px;" id="inputGroupSelect03" name="course">
                             <option value="" selected>Course...</option>
                             {% for course in courses %}
@@ -18,41 +19,48 @@
                             {% endfor %}
                         </select>
                     </div>
-                    <div class="col-2 d-flex align-items-end">
+                    <div class="col-md-2 ms-2">
                         <button type="submit" class="btn btn-outline-primary">Filter</button>
                     </div>
                 </form>
-                <div class="col-2 d-flex align-items-end">
-                    <button type="button" class="btn btn-xs btn-outline-secondary">&plus; Student</button>
+                {% if user.is_superuser %}
+                <div class="col-md-4 d-flex justify-content-end">
+                    <a href="#" class="btn btn-primary"><i class="fas fa-user-plus"></i> Add Student</a>
                 </div>
+                {% endif %}
             </div>
         </div>
-    </div>
-</div>
 
-
-    {% for student in students %}
-    <div class="container mt-3">
-        <div class="card card-design shadow-sm mb-3 border-0">
-            <div class="card-body">
-                <div class="row align-items-center">
-                    <div class="col-md-4">
-                        <h5 class="mb-0 text-uppercase">{{ student.first_name }} {{ student.last_name }}</h5>
-                    </div>
-                    <div class="col-md-6">
-                        <p class="text-secondary mb-1"><strong>Program:</strong> {{ student.program.program_name }}</p>
-                        <p class="text-secondary mb-0"><strong>Semester:</strong> {{ student.semester.semester }}</p>
-                    </div>
-                    <div class="col-md-2 text-md-right d-flex justify-content-end">
-                        <a href="{% url 'students:student_detail' pk=student.pk %}" class="btn btn-primary rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
-                            &gt;
-                        </a>
-                    </div>
-                </div>
-            </div>
+        <!-- Student Table -->
+        <div class="table-responsive">
+            <table class="table table-striped table-hover shadow-sm rounded bg-white">
+                <thead class="thead-dark">
+                    <tr>
+                        <th>#</th>
+                        <th>Name</th>
+                        <th>Program</th>
+                        <th>Semester</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for student in students %}
+                    <tr>
+                        <td>{{ forloop.counter }}</td>
+                        <td>{{ student.first_name }} {{ student.last_name }}</td>
+                        <td>{{ student.program.program_name }}</td>
+                        <td>{{ student.semester.semester }}</td>
+                        <td class="text-end">
+                            <a href="{% url 'students:student_detail' pk=student.pk %}" class="btn btn-primary rounded-circle d-flex align-items-center justify-content-center" style="width: 30px; height: 30px;">
+                                &gt;
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
         </div>
     </div>
-    {% endfor %}
 </div>
 
 {% endblock %}

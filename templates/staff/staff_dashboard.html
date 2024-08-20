@@ -1,65 +1,113 @@
 <!DOCTYPE html>
 {% extends 'staff/index.html' %}
-
 {% load static %}
 
 {% block staff_dashboard %}
 
-<div class="container mt-3">
-    <div class="card shadow-lg" style="width: 100%;">
+<div class="container mt-4">
+    <!-- Profile Card -->
+    <div class="card shadow-lg border-light rounded-4 mb-4">
         <div class="card-body">
             <div class="row align-items-center">
                 <div class="col-md-4 text-center">
-                    <div class="rounded-circle bg-success d-flex justify-content-center align-items-center" style="width: 200px; height: 200px;">
-                        <p class="text-white display-4">{{ user.first_name|slice:":1" }}{{ user.last_name|slice:":1" }}</p>
+                    <div class="rounded-circle bg-success d-flex justify-content-center align-items-center text-white" style="width: 180px; height: 180px; border: 5px solid #fff;">
+                        <span class="display-4 mb-0">{{ user.first_name|slice:":1" }}{{ user.last_name|slice:":1" }}</span>
                     </div>
                 </div>
                 <div class="col-md-5">
-                    <div class="container">
-                        <h6 class="text-secondary">Hello!</h6>
-                        <h1 class="text-primary">{{ user.first_name }} {{ user.last_name }}</h4>
-                    </div>
-                </div>               
+                    <h6 class="text-secondary mb-1">Hello!</h6>
+                    <h1 class="text-primary">{{ user.first_name }} {{ user.last_name }}</h1>
+                </div>
                 <div class="col-md-3">
-                    <div class="container">
-                        <h6 class="text-secondary">Status</h6>
-                        <h5 class="text-success">
-                            {% if user.is_superuser %}
-                                Super Admin
-                            {% elif user.is_staff %}
-                                Teacher
-                            {% else %}
-                                Student
-                            {% endif %}
-                        </h5>  
-                    </div>
+                    <h6 class="text-secondary mb-1">Status</h6>
+                    <h5 class="text-success">
+                        {% if user.is_superuser %}
+                            Super Admin
+                        {% elif user.is_staff %}
+                            Teacher
+                        {% else %}
+                            Student
+                        {% endif %}
+                    </h5>
                 </div>
             </div>
         </div>
     </div>
-    <div class="row {% if user.is_superuser %} justify-content-center {% else %} justify-content-start {% endif %} mt-4">
-        <div class="col-sm-4 card text-white mx-3 bg-primary shadow-lg" style="width: 18rem;">
-            <div class="card-body text-center">
-                <h5 class="card-title">{% if user.is_superuser %} Total {% endif %}Students</h5>
-                <h1 class="display-4 font-weight-bold">{{student_count}}</h1>
+
+    <!-- Statistics Cards -->
+    <div class="row g-4 mb-4">
+        <div class="col-sm-4">
+            <div class="card text-white bg-primary shadow-lg rounded-4">
+                <div class="card-body text-center">
+                    <h5 class="card-title mb-4">{% if user.is_superuser %}Total {% endif %}Students</h5>
+                    <h1 class="display-4 mb-0">{{ student_count }}</h1>
+                </div>
             </div>
         </div>
-        <div class="card text-white mx-3 bg-success shadow-lg" style="width: 18rem;">
-            <div class="card-body text-center">
-                <h5 class="card-title">{% if user.is_superuser %} Total {% endif %}Classes</h5>
-                <h1 class="display-4 font-weight-bold">{{pc_count}}</h1>
+        <div class="col-sm-4">
+            <div class="card text-white bg-success shadow-lg rounded-4">
+                <div class="card-body text-center">
+                    <h5 class="card-title mb-4">{% if user.is_superuser %}Total {% endif %}Classes</h5>
+                    <h1 class="display-4 mb-0">{{ pc_count }}</h1>
+                </div>
             </div>
         </div>
         {% if user.is_superuser %}
-        <div class="card text-white mx-3 bg-primary shadow-lg" style="width: 18rem;">
-            <div class="card-body text-center">
-                <h5 class="card-title">Total Users</h5>
-                <h1 class="display-4 font-weight-bold">{{user_count}}</h1>
+        <div class="col-sm-4">
+            <div class="card text-white bg-primary shadow-lg rounded-4">
+                <div class="card-body text-center">
+                    <h5 class="card-title mb-4">Total Users</h5>
+                    <h1 class="display-4 mb-0">{{ user_count }}</h1>
+                </div>
             </div>
         </div>
         {% endif %}
     </div>
 
+    <!-- Recent Activity -->
+    <div class="card shadow-lg border-light rounded-4 mb-4">
+        <div class="card-body">
+            <h5 class="card-title mb-3">Recent Activity</h5>
+            <ul class="list-group">
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                    <span>Added new course: <strong>Math 101</strong></span>
+                    <span class="badge bg-success rounded-pill">Today</span>
+                </li>
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                    <span>Updated student profile: <strong>John Doe</strong></span>
+                    <span class="badge bg-warning rounded-pill">2 days ago</span>
+                </li>
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                    <span>Assigned new assignment: <strong>Project A</strong></span>
+                    <span class="badge bg-info rounded-pill">1 week ago</span>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Recent Assignments -->
+    <div class="card shadow-lg border-light rounded-4 mb-4">
+        <div class="card-body">
+            <h5 class="card-title mb-3">Recent Assignments</h5>
+            <ul class="list-group">
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                    <span><strong>Assignment 1:</strong> Math Homework</span>
+                    <span class="badge bg-success rounded-pill">Due August 25</span>
+                </li>
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                    <span><strong>Assignment 2:</strong> Science Project</span>
+                    <span class="badge bg-warning rounded-pill">Due September 1</span>
+                </li>
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                    <span><strong>Assignment 3:</strong> History Essay</span>
+                    <span class="badge bg-info rounded-pill">Due September 10</span>
+                </li>
+            </ul>
+        </div>
+    </div>
 </div>
+
+<!-- Bootstrap JS and dependencies -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
 {% endblock %}

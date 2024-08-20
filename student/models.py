@@ -128,11 +128,13 @@ class Assignment(models.Model):
         return self.title
 
 
+
 # Model for Submission
 class Submission(models.Model):
     assignment = models.ForeignKey(Assignment, on_delete=models.CASCADE, related_name='submissions')
     student = models.ForeignKey(User, on_delete=models.CASCADE, related_name='submissions')
-    file = models.FileField(upload_to='images/submissions/')
+    file = models.FileField(upload_to='files/submissions/')
+    text = models.TextField(null=True, blank=True)
     submitted_at = models.DateTimeField(auto_now_add=True)
     is_checked = models.BooleanField(default=False)  # To mark if the submission has been checked for plagiarism
 

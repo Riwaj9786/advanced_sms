@@ -41,7 +41,6 @@ class AssignmentForm(forms.ModelForm):
         self.fields['deadline'].widget = forms.DateInput(attrs={'type': 'date', 'class': 'form-control'})
 
 
-
 class StudentRegistrationForm(UserCreationForm):
     date_of_birth = forms.DateField(required=True)
     password = forms.CharField(widget=forms.PasswordInput)

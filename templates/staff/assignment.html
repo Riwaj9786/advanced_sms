@@ -1,77 +1,54 @@
 <!DOCTYPE html>
 {% extends 'staff/index.html' %}
-
 {% load static %}
 
 {% block assignment %}
-<div class="container flex">
+<div class="container mt-5">
 
     <!-- Trigger button to open the modal -->
-    <button type="button" class="btn mt-3 btn-outline-secondary" data-bs-toggle="modal"
-        data-bs-target="#addAssignmentModal">
+    <button type="button" class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#addAssignmentModal">
         <span aria-hidden="true">+ Add Assignment</span>
     </button>
 
     <!-- Bootstrap modal -->
-    <div class="modal fade" id="addAssignmentModal" tabindex="-1" aria-labelledby="addAssignmentModalLabel"
-        aria-hidden="true">
-        <div class="modal-dialog">
+    <div class="modal fade" id="addAssignmentModal" tabindex="-1" aria-labelledby="addAssignmentModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title text-primary text-uppercase" id="addAssignmentModalLabel">Assign an
-                        Assignment</h5>
+                    <h5 class="modal-title text-primary" id="addAssignmentModalLabel">Assign an Assignment</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
                     <!-- Assignment form -->
                     <form id="assignmentForm" method="POST">
                         {% csrf_token %}
-                        <div class="mb-3 row">
-                            <label class="col-sm-4 col-form-label font-weight-bold" for="id_title">Assignment
-                                Title:</label>
-                            <div class="col-sm-8">
-                                {{ form.title }}
-                            </div>
+                        <div class="mb-3">
+                            <label for="id_title" class="form-label font-weight-bold">Assignment Title:</label>
+                            {{ form.title }}
                         </div>
-                        <div class="mb-3 row">
-                            <label class="col-sm-4 col-form-label font-weight-bold"
-                                for="id_description">Description:</label>
-                            <div class="col-sm-8">
-                                {{ form.description }}
-                            </div>
+                        <div class="mb-3">
+                            <label for="id_description" class="form-label font-weight-bold">Description:</label>
+                            {{ form.description }}
                         </div>
-                        <div class="mb-3 row">
-                            <label class="col-sm-4 col-form-label font-weight-bold" for="id_deadline">Deadline:</label>
-                            <div class="col-sm-8">
-                                {{ form.deadline }}
-                            </div>
+                        <div class="mb-3">
+                            <label for="id_deadline" class="form-label font-weight-bold">Deadline:</label>
+                            {{ form.deadline }}
                         </div>
-                        <div class="mb-3 row">
-                            <label class="col-sm-4 col-form-label font-weight-bold" for="id_worth">Worth:</label>
-                            <div class="col-sm-8">
-                                {{ form.worth }}
-                            </div>
+                        <div class="mb-3">
+                            <label for="id_worth" class="form-label font-weight-bold">Worth:</label>
+                            {{ form.worth }}
                         </div>
-                        <div class="mb-3 row">
-                            <label class="col-sm-4 col-form-label font-weight-bold"
-                                for="id_research_links">References:</label>
-                            <div class="col-sm-8">
-                                {{ form.research_links }}
-                            </div>
+                        <div class="mb-3">
+                            <label for="id_research_links" class="form-label font-weight-bold">References:</label>
+                            {{ form.research_links }}
                         </div>
-                        <div class="mb-3 row">
-                            <label class="col-sm-4 col-form-label font-weight-bold" for="id_accepted_file_type">File
-                                Type:</label>
-                            <div class="col-sm-8">
-                                {{ form.accepted_file_type }}
-                            </div>
+                        <div class="mb-3">
+                            <label for="id_accepted_file_type" class="form-label font-weight-bold">File Type:</label>
+                            {{ form.accepted_file_type }}
                         </div>
-                        <div class="mb-3 row">
-                            <label class="col-sm-4 col-form-label font-weight-bold"
-                                for="id_assigned_class">Class:</label>
-                            <div class="col-sm-8">
-                                {{ form.assigned_class }}
-                            </div>
+                        <div class="mb-3">
+                            <label for="id_assigned_class" class="form-label font-weight-bold">Class:</label>
+                            {{ form.assigned_class }}
                         </div>
                     </form>
                 </div>
@@ -83,65 +60,72 @@
         </div>
     </div>
 
-
-    <div class="container flex mt-5">
-        <div class="row justify-content-start">
-            <div class="col-md-12">
-                <div class="row g-4">
-                    {% if assignments %}
-                        {% for assignment in assignments %}
-                        <div class="col-md-4 mb-4">
-                            <div class="card shadow-sm">
-                                <div class="card-body">
-                                    <h5 class="card-title text-uppercase text-primary">{{ assignment.title }}</h5>
-                                    <p class="card-text text-secondary text-xs fw-light">{{ assignment.assigned_class.course}}</p>
-                                    <div class="row">
-                                        <div class="col-sm-6">
-                                            <p class="card-text"><span class="small text-muted">Deadline:</span></p>
-                                        </div>
-                                        <div class="col-sm-6">
-                                            <p class="card-text">
-                                                <span class="h5 text-danger">
-                                                    {{ assignment.deadline|date:"d-F" }}
-                                                </span>
-                                            </p>
-                                        </div>
-                                    </div>
-                                    <div class="row">
-                                        <div class="col-sm-6">
-                                            <p class="card-text"><span class="small text-muted">Submissions:</span></p>
-                                        </div>
-                                        <div class="col-sm-6">
-                                            <p class="card-text"><span class="h5 text-primary">5</span></p>
-                                        </div>
-                                        <div class="col-sm-6">
-                                            <p class="card-text text-secondary"><span class="small text-muted">Created By:
-                                                    {{ assignment.created_by }}</span></p>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div>
-                                    <a class="my-2 mx-3 btn btn-xs btn-danger"
-                                        href="{% url 'students:delete_assignment' pk=assignment.pk %}">Delete</a>
-                                </div>
+    <!-- Active Assignments Section -->
+    <div class="mt-5">
+        <h3 class="text-success mb-4">Active Assignments</h3>
+        <div class="row g-4">
+            {% if assignments %}
+                {% for assignment in assignments %}
+                <div class="col-md-4">
+                    <div class="card shadow-sm h-100">
+                        <div class="card-body">
+                            <h5 class="card-title text-primary text-uppercase">{{ assignment.title }}</h5>
+                            <p class="card-text text-secondary">{{ assignment.assigned_class.course }}</p>
+                            <div class="d-flex justify-content-between mb-3">
+                                <p class="text-muted mb-0">Deadline:</p>
+                                <p class="text-success mb-0">{{ assignment.deadline|date:"d-M" }}</p>
                             </div>
+                            <p class="text-muted">Created By: {{ assignment.created_by }}</p>
                         </div>
-                        {% endfor %}
-                    {% else %}
-                        <div class="container mt-3 shadow">
-                            <p class="text-sm text-center text-secondary">There are no assigned Assignments.</p>
+                        <div class="card-footer bg-white border-0 d-flex justify-content-between">
+                            <a class="btn btn-sm btn-danger" href="{% url 'students:delete_assignment' pk=assignment.pk %}">Delete</a>
+                            <a class="btn btn-sm btn-primary" href="{% url 'students:submission_view' pk=assignment.pk %}">View Status</a>
                         </div>
-                    {% endif %}
+                    </div>
                 </div>
-            </div>
+                {% endfor %}
+            {% else %}
+                <div class="alert alert-secondary text-center" role="alert">
+                    There are no active Assignments.
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Inactive Assignments Section -->
+    <div class="mt-5">
+        <h3 class="text-secondary mb-4">Inactive Assignments</h3>
+        <div class="row g-4">
+            {% if inactive_assignments %}
+                {% for assignment in inactive_assignments %}
+                <div class="col-md-4">
+                    <div class="card shadow-sm h-100">
+                        <div class="card-body">
+                            <h5 class="card-title text-primary text-uppercase">{{ assignment.title }}</h5>
+                            <p class="card-text text-secondary">{{ assignment.assigned_class.course }}</p>
+                            <div class="d-flex justify-content-between mb-3">
+                                <p class="text-muted mb-0">Deadline:</p>
+                                <p class="text-danger mb-0">{{ assignment.deadline|date:"d-M" }}</p>
+                            </div>
+                            <p class="text-muted">Created By: {{ assignment.created_by }}</p>
+                        </div>
+                        <div class="card-footer bg-white border-0 d-flex justify-content-between">
+                            <a class="btn btn-sm btn-danger" href="{% url 'students:delete_assignment' pk=assignment.pk %}">Delete</a>
+                            <a class="btn btn-sm btn-primary" href="{% url 'students:submission_view' pk=assignment.pk %}">View Status</a>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <div class="alert alert-secondary text-center" role="alert">
+                    There are no inactive Assignments.
+                </div>
+            {% endif %}
         </div>
     </div>
 </div>
 
 <!-- Bootstrap JS and dependencies -->
-<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.2/dist/umd/popper.min.js"></script>
-<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
 {% endblock %}
