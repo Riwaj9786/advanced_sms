@@ -8,6 +8,7 @@ from django.contrib.auth.hashers import make_password
 from datetime import datetime
 from django.contrib import messages
 from django.core.files.storage import FileSystemStorage
+from django.urls import reverse
 
 def home(request):
     if request.user.is_authenticated:
@@ -301,27 +302,23 @@ def session_expired(request):
 
 
 @login_required
-def marks_page(request, course_id, semester_id):
-    try:
-        course = Course.objects.get(id=course_id)
-        semester = Semester.objects.get(id=semester_id)
-        students = Student.objects.filter(programcourse__course=course, semester=semester)
-    except (Course.DoesNotExist, Semester.DoesNotExist):
-        messages.error(request, "Invalid course or semester")
-        return redirect('some_error_page')  # Redirect to an error page or similar
-
+def marks_page(request, course_id):
+    course = get_object_or_404(Course, pk=course_id)
+    students = Student.objects.filter(course=course)
+    
     if request.method == 'POST':
         for student in students:
-            marks_obtained = request.POST.get(f'marks_{student.id}')
-            max_marks = request.POST.get(f'max_marks_{student.id}')
-            if marks_obtained and max_marks:
-                # Validate and create or update the marks entry
-                Marks.objects.update_or_create(
-                    student=student,
-                    course=course,
-                    defaults={'marks_obtained': marks_obtained, 'max_marks': max_marks}
+            marks_field_name = f'marks_{student.id}'
+            marks_obtained = request.POST.get(marks_field_name)
+            if marks_obtained:
+                mark, created = Marks.objects.update_or_create(
+                    student=student, course=course,
+                    defaults={'marks_obtained': marks_obtained}
                 )
-        messages.success(request, "Marks updated successfully")
-        return redirect('marks_page', course_id=course_id, semester_id=semester_id)
+        return redirect(reverse('marks_page', args=[course_id]))
 
-    return render(request, 'marks_page.html', {'course': course, 'semester': semester, 'students': students})
+    context = {
+        'course': course,
+        'students': students,
+    }
+    return render(request, 'staff/marks_page.html', context)

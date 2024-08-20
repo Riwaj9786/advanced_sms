@@ -7,38 +7,5 @@
 <div class="container mt-5">
     <h2 class="mb-4">Upload Marks for {{ course.course_name }} - {{ semester.semester }}</h2>
 
-    <form method="POST" action="{% url 'upload_marks' %}">
-        {% csrf_token %}
-        <div class="card shadow-sm mb-4">
-            <div class="card-body">
-                <table class="table table-bordered">
-                    <thead>
-                        <tr>
-                            <th>Student Name</th>
-                            <th>Marks Obtained</th>
-                            <th>Max Marks</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for student in students %}
-                        <tr>
-                            <td>{{ student.first_name }} {{ student.last_name }}</td>
-                            <td>
-                                <input type="number" name="marks_{{ student.id }}" class="form-control" step="0.01">
-                            </td>
-                            <td>
-                                <input type="number" name="max_marks_{{ student.id }}" class="form-control" step="0.01">
-                            </td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-        </div>
 
-        <div class="text-center">
-            <button type="submit" class="btn btn-primary">Submit All Marks</button>
-        </div>
-    </form>
-</div>
 {% endblock %}
