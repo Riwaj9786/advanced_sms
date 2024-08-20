@@ -171,8 +171,8 @@
                 href="{% url 'students:assignments' pk=user.pk %}">
                 <i class="fas fa-tasks"></i> <span>Assignments</span>
             </a>
-            <a class="nav-link {% if request.resolver_match.url_name == 'marks_view' %}active{% endif %}"
-                href="{% url 'students:classes_view' pk=user.pk %}">
+            <a class="nav-link {% if request.resolver_match.url_name == 'marks_dashboard' %}active{% endif %}"
+                href="{% url 'students:marks_dashboard' pk=user.pk %}">
                 <i class="fas fa-book"></i> <span>Marks</span>
             </a>
             <div class="mt-auto">
@@ -221,7 +221,7 @@
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-light" href="{% url 'students:classes_view' pk=user.pk %}">
+                            <a class="nav-link text-light" href="{% url 'students:marks_dashboard' pk=user.pk %}">
                                 Marks
                             </a>
                         </li>
@@ -263,7 +263,10 @@
             {% block submission_view %}
             {% endblock %}
 
-            {% block marks_page %}
+            {% block marks_dashboard %}
+            {% endblock %}
+
+            {% block marking_page %}
             {% endblock %}
         </div>
     </div>

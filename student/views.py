@@ -300,25 +300,73 @@ def session_expired(request):
     return render(request, 'session_expire.html')
 
 
+@login_required
+def marks_dashboard(request, pk):
+    teacher = get_object_or_404(User, pk=pk)
+    program_courses = ProgramCourse.objects.filter(teacher=teacher)
+
+    if teacher != request.user:
+        return HttpResponseForbidden("You are not authorized!")
+
+    return render(request, 'staff/marks_dashboard.html', {
+        'teacher': teacher,
+        'program_courses': program_courses
+    })
+
 
 @login_required
-def marks_page(request, course_id):
-    course = get_object_or_404(Course, pk=course_id)
-    students = Student.objects.filter(course=course)
-    
-    if request.method == 'POST':
-        for student in students:
-            marks_field_name = f'marks_{student.id}'
-            marks_obtained = request.POST.get(marks_field_name)
-            if marks_obtained:
-                mark, created = Marks.objects.update_or_create(
-                    student=student, course=course,
-                    defaults={'marks_obtained': marks_obtained}
-                )
-        return redirect(reverse('marks_page', args=[course_id]))
+def marking_page(request, program_id, course_id, semester_id):
+    # Retrieve the specific course and semester
+    course = get_object_or_404(Course, course_id=course_id)
+    program = get_object_or_404(Program, program_id=program_id)
+    semester = get_object_or_404(Semester, semester_id=semester_id)
 
-    context = {
+    # Retrieve the ProgramCourse for the given course and semester
+    program_course = get_object_or_404(ProgramCourse, program=program, course=course, semester=semester)
+    
+    # Filter students who are enrolled in the specific course and semester
+    students = Student.objects.filter(
+        program=program,
+        semester=semester
+    ).distinct()
+
+    if request.method == 'POST':
+        if 'submit_all' in request.POST:
+            for student in students:
+                marks = request.POST.get(f'marks_{student.id}')
+                if marks:
+                    # Check if marks already exist; if not, create a new entry
+                    mark_entry, created = Marks.objects.get_or_create(
+                        student=student,
+                        course=course,
+                        defaults={'marks_obtained': float(marks), 'max_marks': 100.00}  # Default max_marks if not specified
+                    )
+                    if not created:
+                        mark_entry.marks_obtained = float(marks)
+                        mark_entry.save()
+            messages.success(request, 'All marks have been updated successfully.')
+
+        else:
+            # Handle individual marks saving
+            for student in students:
+                mark_key = f'save_{student.id}'
+                if mark_key in request.POST:
+                    marks = request.POST.get(f'marks_{student.id}')
+                    if marks:
+                        mark_entry, created = Marks.objects.get_or_create(
+                            student=student,
+                            course=course,
+                            defaults={'marks_obtained': float(marks), 'max_marks': 100.00}  # Default max_marks if not specified
+                        )
+                        if not created:
+                            mark_entry.marks_obtained = float(marks)
+                            mark_entry.save()
+                        messages.success(request, f'Marks for {student.first_name} {student.last_name} saved successfully.')
+
+        return redirect('students:marking_page', course_id=course_id, program_id=program_id, semester_id=semester_id)
+
+    return render(request, 'staff/marking_page.html', {
         'course': course,
         'students': students,
-    }
-    return render(request, 'staff/marks_page.html', context)
+        'program_course': program_course,
+    })

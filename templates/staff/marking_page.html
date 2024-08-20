@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+{% extends 'staff/index.html' %}
+{% load static %}
+
+{% block marking_page %}
+<div class="container mt-5">
+    <div class="card shadow-lg p-4">
+        <div class="row g-4 mb-3">
+            <div class="col-md-6">
+                <h2 class="text-primary">{{ course.course_name }}</h2>
+                <h6 class="text-muted">{{ course.course_id }}</h6>
+            </div>
+        </div>
+        <form method="POST">
+            {% csrf_token %}
+            <div class="card shadow-sm mb-4">
+                <div class="card-body">
+                    <table class="table table-bordered table-hover">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Registration No.</th>
+                                <th>Student Name</th>
+                                <th>Assignment Submission</th>
+                                <th>Marks</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for student in students %}
+                            <tr>
+                                <td>{{ student.registration_number }}</td>
+                                <td>{{ student.first_name }} {{ student.last_name }}</td>
+                                <td>
+                                    <!-- Display assignment submissions here -->
+                                    {% for submission in student.submissions.all %}
+                                        <p class="mb-0">
+                                            {{ submission.assignment.title }} - Submitted on {{ submission.submitted_at|date:"d M Y" }}
+                                        </p>
+                                    {% empty %}
+                                        <p>No submissions</p>
+                                    {% endfor %}
+                                </td>
+                                <td>
+                                    <input type="number" name="marks_{{ student.id }}" class="form-control" value="{{ student.marks|default_if_none:'' }}" step="0.01">
+                                </td>
+                                <td>
+                                    <button type="submit" name="save_{{ student.id }}" class="btn btn-sm btn-primary">Save</button>
+                                    <button type="button" class="btn btn-sm btn-warning">Edit</button>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="text-center">
+                <a class="btn btn-outline-secondary mx-2" href="{% url 'students:marks_dashboard' pk=user.pk %}">Back</a>
+                <button type="submit" name="submit_all" class="btn btn-success mx-2">Submit All Marks</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+{% endblock %}

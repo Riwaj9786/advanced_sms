@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+
+{% extends 'staff/index.html' %}
+
+{% load static %}
+
+{% block marks_dashboard %}
+<div class="container mt-5">
+    <div class="card mb-4 border-0 shadow-lg">
+        <div class="card-body text-center">
+            <h5 class="card-title text-primary mb-3">Assigned Courses</h5>
+            <h1 class="display-4">{{ program_courses|length }}</h1>
+        </div>
+    </div>
+
+    <div class="row">
+        {% for pc in program_courses %}
+        <div class="col-12 col-sm-6 col-md-4 col-lg-3 mb-4 d-flex align-items-stretch">
+            <a class="text-decoration-none" href="{% url 'students:marking_page' course_id=pc.course.course_id program_id=pc.program.program_id semester_id=pc.semester.semester_id %}">
+                <div class="card border-0 rounded-3 shadow-lg h-100">
+                    <div class="card-body d-flex flex-column p-4">
+                        <p class="card-text mb-2 text-secondary">{{ pc.program }}</p>
+                        <h3 class="card-title text-primary mb-3">{{ pc.course }}</h3>
+                        <p class="card-text mt-auto">Semester: <span class="badge bg-info">{{ pc.semester }}</span></p>
+                    </div>
+                </div>
+            </a>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+{% endblock %}

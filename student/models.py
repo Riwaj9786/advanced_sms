@@ -104,7 +104,7 @@ class Marks(models.Model):
     grade = models.CharField(max_length=2, blank=True, null=True)
 
     def __str__(self):
-        return f"{self.student.user.get_full_name() or self.student.user.username} - {self.course.course_name}"
+        return f"{self.student.first_name or self.student.user.username} - {self.course.course_name}"
 
 
 
