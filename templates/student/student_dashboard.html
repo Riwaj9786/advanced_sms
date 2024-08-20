@@ -4,31 +4,28 @@
 {% load static %}
 
 {% block student_dashboard %}
-<div class="container mt-3">
-    <div class="card shadow-lg" style="width: 100%;">
+<div class="container mt-4">
+    <div class="card shadow-lg">
         <div class="card-body">
             <div class="row align-items-center">
                 <div class="col-md-3 text-center">
                     <div class="rounded-circle bg-success d-flex justify-content-center align-items-center"
-                        style="width: 200px; height: 200px;">
-                        <p class="text-white display-4">{{ student.first_name|slice:":1" }}{{student.last_name|slice:":1" }}</p>
+                        style="width: 150px; height: 150px;">
+                        <p class="text-white display-4 m-0">{{ student.first_name|slice:":1" }}{{ student.last_name|slice:":1" }}</p>
                     </div>
                 </div>
                 <div class="col-md-6">
-                    <div class="container p-3">
-                        <h1 class="text-primary text-uppercase mb-3">{{ user.first_name }} {{ user.last_name }}</h4>
-                            <p class="text-xs text-secondary">{{ student.registration_number }}<br>
-                                {{ student.email }} <br>
-                                {{ student.program.program_name}} | Semester {{student.semester.semester}}
-                            </p>
+                    <div class="p-3">
+                        <h2 class="text-primary text-uppercase mb-2">{{ student.first_name }} {{ student.last_name }}</h2>
+                        <p class="text-muted small mb-1">{{ student.registration_number }}</p>
+                        <p class="text-muted small mb-1">{{ student.email }}</p>
+                        <p class="text-muted small mb-0">{{ student.program.program_name }} | Semester {{ student.semester.semester }}</p>
                     </div>
                 </div>
-                <div class="col-md-3">
-                    <div class="container">
-                        <h6 class="text-secondary">Status</h6>
-                        <h5 class="text-success">
-                            Student
-                        </h5>
+                <div class="col-md-3 text-center">
+                    <div class="p-3">
+                        <h6 class="text-secondary mb-1">Status</h6>
+                        <span class="badge bg-success p-2 fs-6">Student</span>
                     </div>
                 </div>
             </div>
