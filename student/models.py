@@ -1,6 +1,8 @@
+import os
 import uuid
 from django.db import models
 from django.contrib.auth.models import User, AbstractUser
+from django.conf import settings
 from django.utils.text import slugify
 
 class Program(models.Model):
@@ -52,7 +54,7 @@ class User(AbstractUser):
 
 
 class Student(models.Model):
-    registration_number = models.CharField(max_length=30, unique=True, editable=False)
+    registration_number = models.CharField(max_length=30, unique=True)
     first_name = models.CharField(max_length=50)
     middle_name = models.CharField(max_length=50, null=True, blank=True)
     last_name = models.CharField(max_length=100)
@@ -100,7 +102,7 @@ class Marks(models.Model):
     student = models.ForeignKey(Student, on_delete=models.CASCADE)
     course = models.ForeignKey(Course, on_delete=models.CASCADE)
     marks_obtained = models.DecimalField(max_digits=5, decimal_places=2)
-    max_marks = models.DecimalField(max_digits=5, decimal_places=2)
+    max_marks = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True)
     grade = models.CharField(max_length=2, blank=True, null=True)
 
     def __str__(self):
@@ -119,14 +121,28 @@ class Assignment(models.Model):
     description = models.TextField(null=True, blank=True)
     deadline = models.DateTimeField()
     worth = models.IntegerField()
-    research_links = models.JSONField(blank=True, null=True)  # This field can store a list of URLs
+    research_files = models.ManyToManyField('AssignmentFile', blank=True)  # Multiple files can be linked here
     accepted_file_type = models.CharField(max_length=10, choices=ACCEPTED_FILE_TYPES)
     assigned_class = models.ForeignKey(ProgramCourse, on_delete=models.CASCADE, related_name='assignments')
     created_by = models.ForeignKey(User, null=True, on_delete=models.CASCADE)
+    plagiarism_checked = models.BooleanField(default=False)  # Plagiarism flag
 
     def __str__(self):
         return self.title
+    
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        assignment_dir = os.path.join(settings.MEDIA_ROOT, 'assignments', str(self.id))
+        if not os.path.exists(assignment_dir):
+            os.makedirs(assignment_dir)
 
+
+class AssignmentFile(models.Model):
+    file = models.FileField(upload_to='files/assignments/')
+    uploaded_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return os.path.basename(self.file.name)
 
 
 # Model for Submission

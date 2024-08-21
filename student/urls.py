@@ -1,5 +1,7 @@
 from django.urls import path
 from student import views
+from django.conf import settings
+from django.conf.urls.static import static
 
 app_name = 'students'
 
@@ -24,4 +26,4 @@ urlpatterns = [
     path('student/dashboard/<pk>/', views.student_dashboard, name='student_dashboard'),
     path('student/assignments/', views.student_assignment_view, name="student_assignments"),
     path('student/assignment/<pk>/', views.assignment_view, name="assignment_view"),
-]
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

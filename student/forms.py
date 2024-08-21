@@ -29,7 +29,7 @@ class LoginForm(forms.Form):
 class AssignmentForm(forms.ModelForm):
     class Meta:
         model = Assignment
-        fields = ['title', 'description', 'deadline', 'worth', 'research_links', 'accepted_file_type', 'assigned_class']
+        fields = ['title', 'description', 'deadline', 'worth', 'research_files', 'accepted_file_type', 'assigned_class']
 
     def __init__(self, *args, **kwargs):
         teacher = kwargs.pop('teacher', None)

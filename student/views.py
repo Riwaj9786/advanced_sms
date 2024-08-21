@@ -136,7 +136,7 @@ def student_lists(request, pk):
         return HttpResponseForbidden("You are not authorized!")
 
     course = request.GET.get('course')
-    students = Student.objects.filter(semester__programcourse__in=program_courses).distinct()
+    students = Student.objects.filter(semester__programcourse__in=program_courses).distinct().order_by('registration_number')
 
     if course:
         students = students.filter(semester__programcourse__course__course_name=course)
@@ -323,7 +323,8 @@ def marking_page(request, program_id, course_id, semester_id):
 
     # Retrieve the ProgramCourse for the given course and semester
     program_course = get_object_or_404(ProgramCourse, program=program, course=course, semester=semester)
-    
+    marks = Marks.objects.filter(course=course)
+
     # Filter students who are enrolled in the specific course and semester
     students = Student.objects.filter(
         program=program,
@@ -368,5 +369,6 @@ def marking_page(request, program_id, course_id, semester_id):
     return render(request, 'staff/marking_page.html', {
         'course': course,
         'students': students,
+        'marks': marks,
         'program_course': program_course,
     })
