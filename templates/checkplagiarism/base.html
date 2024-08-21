@@ -179,6 +179,8 @@
                 href="{% url 'plagiarism:plagiarism_checker'%}">
                 <i class="fas fa-copy"></i> <span>Plagiarism</span>
             </a>
+
+
             <div class="mt-auto">
                 <a class="nav-link" href="#">
                     <i class="fas fa-cogs"></i> <span>Settings</span>
@@ -254,6 +256,7 @@
     <!-- Content -->
     <div class="content">
         <div class="container">
+            
             {% block staff_dashboard %}
             {% endblock %}
 
@@ -276,6 +279,9 @@
             {% endblock %}
 
             {% block marking_page %}
+            {% endblock %}
+
+            {% block content %}
             {% endblock %}
         </div>
     </div>

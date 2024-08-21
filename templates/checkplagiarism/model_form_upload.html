@@ -1,0 +1,48 @@
+{% extends 'checkplagiarism/base.html' %}
+
+{% load static %}
+
+{% block content %}
+
+  <form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+  </br>
+  Choose file to check plagiarism:
+  <input type="file" class="form-control" id="file_to_check_for" name="file_to_check_for" accept=".txt,.doc,.docx,.xml,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,.txt,.csv" required>
+    
+  </br>
+    <label class="switch">
+      <input type="checkbox" name="save-or-not" id="save-or-not" value="SAVE_FILE">
+      <span class="slider round">Save file for future check</span>
+    </label>
+    
+    
+    <!-- <div class="form-check">
+      <input class="form-check-input" type="radio" name="save-file" id="save-or-not" group="save-or-not" value="SAVE_FILE">
+      <label class="form-check-label" for="save-file">
+        Save file for future
+      </label>
+    </div>
+    <div class="form-check">
+        <input class="form-check-input" type="radio" name="plagiarism-check-only" id="save-or-not"  group="save-or-not" value="CHECK_ONLY" checked="true">
+        <label class="form-check-label" for="plagiarism-check-only">
+            Check Only
+        </label>
+    </div> -->
+    </br>
+    </br>
+    <button type="submit" class="btn btn-primary">Upload</button>
+  </form>
+
+  {% if uploaded_file_url %}
+    <p>File uploaded at: <a href="{{ uploaded_file_url }}">{{ uploaded_file_url }}</a></p>
+  {% endif %}
+
+  {% if plagiarism_check_result %}
+    plagiarism_check_result: <pre>{{ plagiarism_check_result | pprint  }}</pre>
+  {% endif %}
+
+  
+  
+
+{% endblock %}
