@@ -27,4 +27,6 @@ urlpatterns = [
     path('student/dashboard/<pk>/', views.student_dashboard, name='student_dashboard'),
     path('student/assignments/', views.student_assignment_view, name="student_assignments"),
     path('student/assignment/<pk>/', views.assignment_view, name="assignment_view"),
+
+    path('staff/assignments/<pk>/check_plagiarism/', views.check_plagiarism, name='check_plagiarism'), # todo
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

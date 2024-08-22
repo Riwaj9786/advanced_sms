@@ -48,7 +48,10 @@
         <div class="col-md-12">
             <div class="card shadow-lg" style="border-radius: 15px;">
                 <div class="card-body">
-                    <h4 class="card-title text-primary">Submissions</h4>
+                    <div class="row">
+                        <h4 class="col-9 card-title text-primary">Submissions</h4>
+                        <a href="{% url 'students:check_plagiarism' pk=assignment.pk %}" class="col-2 btn btn-outline-primary" style="margin-bottom: 5px;"><i class="fas fa-copy"></i> Check Plagiarism</a>
+                    </div>
                     {% if submissions %}
                     <table class="table table-bordered">
                         <thead>
@@ -75,6 +78,36 @@
                                 <td>
                                     {% if submission.is_checked %}
                                         <span class="badge bg-danger">Flagged for Plagiarism</span>
+                                        <div>
+                                            <table class="table table-bordered">
+                                                <thead>
+                                                    <tr>
+                                                        <th scope="col">Student Name</th>
+                                                        <th scope="col">Submission</th>
+                                                        <th scope="col">Plagiarism Score</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    {% for pr in submission.plagiarism_result.all %}
+                                                        <tr>
+                                                            <td>{{ pr.submission_checked_with.student.first_name }} {{ pr.submission_checked_with.student.last_name }}</td>
+                                                            <td>
+                                                                {% if pr.submission_checked_with.assignment.accepted_file_type == 'pdf' %}
+                                                                    <a href="{{ pr.submission_checked_with.file.url }}" target="_blank">View PDF</a>
+                                                                {% elif pr.submission_checked_with.assignment.accepted_file_type == 'text' %}
+                                                                    <!-- Button to open the modal -->
+                                                                    <a href="{{ pr.submission_checked_with.text.url }}" target="_blank">View Text</a>
+                                                                {% endif %}
+                                                            </td>
+                                                            <td>
+                                                                {{ pr.score }}
+                                                            </td>
+                                                        </tr>
+                                                    {% endfor %}
+                                                </tbody>
+                                            </table>  
+                                        </div>
+                                        
                                     {% else %}
                                         <span class="badge bg-success">No Issues</span>
                                     {% endif %}
@@ -91,5 +124,4 @@
         </div>
     </div>
 </div>
-
 {% endblock %}

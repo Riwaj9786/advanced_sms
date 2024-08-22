@@ -3,7 +3,7 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.http import HttpResponse, HttpResponseForbidden
 from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth.decorators import login_required
-from student.models import Student, ProgramCourse, Course, Semester, User, Program, Marks, Assignment, Submission
+from student.models import Student, ProgramCourse, Course, Semester, User, Program, Marks, Assignment, Submission, Plagiarism
 from student.forms import RegisterForm, LoginForm, AssignmentForm
 from django.contrib.auth.hashers import make_password
 from datetime import datetime
@@ -11,6 +11,9 @@ from django.contrib import messages
 from django.conf import settings
 from django.core.files.storage import FileSystemStorage
 from django.urls import reverse
+from student import utils
+
+# from glob import glob
 
 def home(request):
     if request.user.is_authenticated:
@@ -464,3 +467,65 @@ def marking_page(request, program_id, course_id, semester_id):
         'students_with_marks': students_with_marks,
         'program_course': program_course,
     })
+
+
+MAX_PLAGIARISM_SCORE = 40
+
+@login_required
+def check_plagiarism(request, pk):
+    print("checking plagiarism for assignment with PK:",pk)
+
+    user = request.user
+    if user.is_staff:
+        assignment = get_object_or_404(Assignment, pk=pk)
+        submissions = Submission.objects.filter(assignment=assignment)
+
+        for submission_to_check in submissions:
+            print("Checking submission for student:", submission_to_check.student.pk)
+            plagiarism_result_for_current_user = []
+            for submission_to_check_with in submissions:
+                if submission_to_check.student.pk == submission_to_check_with.student.pk:
+                    continue
+                
+                file_url_to_check = "media/"+str(submission_to_check.file)
+                file_url_to_check_with = "media/"+str(submission_to_check_with.file)
+                first_content_to_check = utils.read_file(file_url_to_check)
+                first_content_to_check_with = utils.read_file(file_url_to_check_with)
+                score = utils.check_plagiarism(first_content_to_check, first_content_to_check_with)
+
+                if score >= MAX_PLAGIARISM_SCORE:
+                    submission_to_check.is_checked = False
+                    print("Copied from student:", submission_to_check_with.student.pk)
+                    print("Plagiarism score:", score)
+                    
+                    p = Plagiarism(
+                        submission_to_check = submission_to_check,
+                        submission_checked_with = submission_to_check_with, 
+                        score = score
+                    )
+                    p.save()
+                    
+                    plagiarism_result_for_current_user.append(p)
+                
+            if plagiarism_result_for_current_user :
+                print("Saving final result  :", plagiarism_result_for_current_user)
+                submission_to_check.plagiarism_result.set(plagiarism_result_for_current_user)
+                submission_to_check.is_checked = True
+                submission_to_check.save()
+            else:
+                submission_to_check.plagiarism_result.clear()
+                submission_to_check.is_checked = False
+                submission_to_check.save()
+
+
+        submissions = Submission.objects.filter(assignment=assignment)
+        print("submissions: ", submissions)
+        
+        return render(request, 'staff/submission_view.html', {
+            'assignment': assignment,
+            'submissions': submissions
+        })
+
+
+    # return render(request, 'student/assignment_view.html', {'assignment': assignment, 'submission': submission})
+    return submission_view(request, pk)

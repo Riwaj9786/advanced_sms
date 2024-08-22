@@ -153,7 +153,7 @@ class AssignmentFile(models.Model):
     def __str__(self):
         return os.path.basename(self.file.name)
 
-
+    
 # Model for Submission
 class Submission(models.Model):
     assignment = models.ForeignKey(Assignment, on_delete=models.CASCADE, related_name='submissions')
@@ -163,6 +163,15 @@ class Submission(models.Model):
     submitted_at = models.DateTimeField(auto_now_add=True)
     is_checked = models.BooleanField(default=False)
     is_submitted = models.BooleanField(default=False)
+    plagiarism_result = models.ManyToManyField('Plagiarism', blank=True)
 
     def __str__(self):
         return f"{self.student.username} - {self.assignment.title}"
+
+class Plagiarism(models.Model):
+    submission_to_check = models.ForeignKey(Submission, on_delete=models.CASCADE, related_name='submissions_plagiarism_of')
+    submission_checked_with = models.ForeignKey(Submission, on_delete=models.CASCADE, related_name='submissions_plagiarism_with')
+    score = models.FloatField(default=0)
+
+    def __str__(self) -> str:
+        return f"on assignment { self.submission_to_check.assignment.title} {self.submission_to_check.student.username} - copied from - {self.submission_checked_with.student.username} - and plagiarism score is - {self.score}"
