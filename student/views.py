@@ -316,59 +316,67 @@ def marks_dashboard(request, pk):
 
 @login_required
 def marking_page(request, program_id, course_id, semester_id):
-    # Retrieve the specific course and semester
+    marks_dict = {}
+
+    # Retrieve the specific course, program, and semester
     course = get_object_or_404(Course, course_id=course_id)
     program = get_object_or_404(Program, program_id=program_id)
     semester = get_object_or_404(Semester, semester_id=semester_id)
 
-    # Retrieve the ProgramCourse for the given course and semester
+    # Retrieve the ProgramCourse for the given course, program, and semester
     program_course = get_object_or_404(ProgramCourse, program=program, course=course, semester=semester)
-    marks = Marks.objects.filter(course=course)
 
     # Filter students who are enrolled in the specific course and semester
-    students = Student.objects.filter(
-        program=program,
-        semester=semester
-    ).distinct()
+    students = Student.objects.filter(program=program, semester=semester).distinct().order_by('first_name')
+
+    # Initialize marks dictionary for each student
+    for student in students:
+        marks = Marks.objects.filter(course=course, student=student).first()
+        marks_dict[student.id] = marks.marks_obtained if marks else None
 
     if request.method == 'POST':
         if 'submit_all' in request.POST:
             for student in students:
-                marks = request.POST.get(f'marks_{student.id}')
-                if marks:
-                    # Check if marks already exist; if not, create a new entry
+                marks_value = request.POST.get(f'marks_{student.id}')
+                if marks_value:
                     mark_entry, created = Marks.objects.get_or_create(
                         student=student,
                         course=course,
-                        defaults={'marks_obtained': float(marks), 'max_marks': 100.00}  # Default max_marks if not specified
+                        defaults={'marks_obtained': float(marks_value), 'max_marks': 100.00}
                     )
                     if not created:
-                        mark_entry.marks_obtained = float(marks)
+                        mark_entry.marks_obtained = float(marks_value)
                         mark_entry.save()
             messages.success(request, 'All marks have been updated successfully.')
 
         else:
-            # Handle individual marks saving
             for student in students:
-                mark_key = f'save_{student.id}'
-                if mark_key in request.POST:
-                    marks = request.POST.get(f'marks_{student.id}')
-                    if marks:
+                if f'save_{student.id}' in request.POST:
+                    marks_value = request.POST.get(f'marks_{student.id}')
+                    if marks_value:
                         mark_entry, created = Marks.objects.get_or_create(
                             student=student,
                             course=course,
-                            defaults={'marks_obtained': float(marks), 'max_marks': 100.00}  # Default max_marks if not specified
+                            defaults={'marks_obtained': float(marks_value), 'max_marks': 100.00}
                         )
                         if not created:
-                            mark_entry.marks_obtained = float(marks)
+                            mark_entry.marks_obtained = float(marks_value)
                             mark_entry.save()
                         messages.success(request, f'Marks for {student.first_name} {student.last_name} saved successfully.')
 
         return redirect('students:marking_page', course_id=course_id, program_id=program_id, semester_id=semester_id)
 
+    # Annotate students with their marks
+    students_with_marks = []
+    for student in students:
+        marks_obtained = marks_dict.get(student.id, None)
+        students_with_marks.append({
+            'student': student,
+            'marks_obtained': marks_obtained
+        })
+
     return render(request, 'staff/marking_page.html', {
         'course': course,
-        'students': students,
-        'marks': marks,
+        'students_with_marks': students_with_marks,
         'program_course': program_course,
     })

@@ -20,41 +20,22 @@
                             <tr>
                                 <th>Registration No.</th>
                                 <th>Student Name</th>
-                                <th>Assignment Submission</th>
-                                <th>Enter Mark</th>
-                                <th>Marks Obtained</th>
+                                <th>Obtained Mark</th>
                                 <th>Actions</th>
                             </tr>
                         </thead>
                         <tbody>
-                            {% for student in students %}
+                            {% for item in students_with_marks %}
                             <tr>
-                                <td>{{ student.registration_number }}</td>
-                                <td>{{ student.first_name }} {{ student.last_name }}</td>
-                                <td>
-                                    <!-- Display assignment submissions here -->
-                                    {% for submission in student.submissions.all %}
-                                        <p class="mb-0">
-                                            {{ submission.assignment.title }} - Submitted on {{ submission.submitted_at|date:"d M Y" }}
-                                        </p>
-                                    {% empty %}
-                                        <p>No submissions</p>
-                                    {% endfor %}
+                                <td>{{ item.student.registration_number }}</td>
+                                <td>{{ item.student.first_name }} {{ item.student.last_name }}</td>
+                                <td class="fw-bold text-center">
+                                    <input type="number" name="marks_{{ item.student.id }}" class="form-control"
+                                           value="{% if item.marks_obtained %}{{ item.marks_obtained }}{% else %}0{% endif %}" step="0.01">
                                 </td>
-                                <td>
-                                    <input type="number" name="marks_{{ student.id }}" class="form-control" 
-                                           value="{{ marks_for_students|default_if_none:0 }}" step="0.01">
-                                </td>
-                                <td>
-                                    {% if marks %}
-                                        {{marks.student}}
-                                    {% else %}
-                                        -
-                                    {% endif %}
 
-                                </td>
-                                <td>
-                                    <button type="submit" name="save_{{ student.id }}" class="btn btn-sm btn-primary">Save</button>
+                                <td class="text-center">
+                                    <button type="submit" name="save_{{ item.student.id }}" class="btn btn-sm btn-primary">Save</button>
                                 </td>
                             </tr>
                             {% endfor %}
