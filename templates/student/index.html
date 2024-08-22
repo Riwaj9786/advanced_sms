@@ -154,7 +154,8 @@
                 href="{% url 'students:student_dashboard' pk=user.pk %}">
                 <i class="fas fa-tachometer-alt me-2"></i> Dashboard
             </a>
-            <a class="nav-link text-light mb-2" href="{% url 'students:student_assignments' %}">
+            <a class="nav-link text-light mb-2 {% if request.resolver_match.url_name == 'student_assignments' %}active{% endif %}" 
+                href="{% url 'students:student_assignments' %}">
                 <i class="fas fa-tasks me-2"></i> Assignments
             </a>
             <a class="nav-link text-light mb-2" href="#">

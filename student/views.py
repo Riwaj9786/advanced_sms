@@ -76,6 +76,24 @@ def user_register(request):
 
     return render(request, 'registration/signup.html', {'form': form})
 
+
+@login_required
+def total_students(request):
+    user = request.user
+    if user.is_superuser:
+        # Order students by registration number (descending) and then by first name (ascending)
+        students = Student.objects.all().order_by('registration_number', 'first_name')
+    else:
+        # Redirect non-superuser with an error message
+        messages.error(request, "You are not authorized to view this page.")
+        return redirect('home')  # Replace 'home' with the name of the page to redirect to
+
+    return render(request, 'staff/students.html', {
+        'students': students,
+    })
+
+
+
 @login_required
 def staff_dashboard(request, pk):
     teacher = get_object_or_404(User, pk=pk)
@@ -161,7 +179,7 @@ def student_lists(request, pk):
 def student_detail(request, pk):
     student = get_object_or_404(Student, pk=pk)
 
-    return render(request, 'student/student_detail.html', {'student': student})
+    return render(request, 'staff/student_detail.html', {'student': student})
 
 @login_required
 def classes_view(request, pk):

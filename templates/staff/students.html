@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+{% extends 'staff/index.html' %}
+
+{% load static %}
+
+{% block students %}
+<div class="container mt-5">
+    <table class="table table-striped">
+        <thead>
+            <th>Reg. Number</th>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Program</th>
+            <th>User</th>
+        </thead>
+        {% for student in students %}
+        <tr>
+            <td>{{student.registration_number}}</td>
+            <td>{{student.first_name}} {%if student.middle_name %} {{student.middle_name}} {% endif %} {{student.last_name}}</td>
+            <td>{{student.email}}</td>
+            <td>{{student.program.program_name}}</td>
+            <td>
+                {% if student.user %}
+                    {{student.user.username}}
+                {% else %}
+                    -
+                {% endif %}
+            </td>        
+        </tr>
+        {% endfor %}
+    </table>
+</div>
+{% endblock %}
