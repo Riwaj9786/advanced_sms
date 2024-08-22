@@ -6,61 +6,205 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Edu-Ikshya</title>
+
     <!-- Bootstrap CSS -->
-    <link rel="stylesheet" href="{% static 'css/style.css' %}">
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+
     <style>
+        /* General styles */
+        body, html {
+            height: 100%;
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-image: url("{% static 'images/logo/background.jpg' %}");
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            position: relative;
+        }
+
+        /* Overlay to reduce opacity */
+        body::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            
+            z-index: 1;
+        }
+
+        /* Container and content styles */
+        .container {
+            position: relative;
+            z-index: 2;
+            max-width: 900px;
+            background-color: rgba(232, 220, 220, 0.9);
+            border-radius: 20px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+        }
+
         .vh-100 {
-            height: 100vh;
+            height: 10vh;
         }
 
         .rounded-3 {
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 15px;
         }
 
-        .col-md-6 {
+        /* Photo section */
+        .col-md-6.photo-section {
+            background-color: #0e0e59;
             display: flex;
             justify-content: center;
             align-items: center;
+            flex-direction: column;
+            padding: 2rem;
+            color: #fff;
         }
 
-        .rounded-circle {
-            max-width: 100%;
+        .photo-section img {
+            width: 150px;
             height: auto;
+            border-radius: 50%;
+            margin-bottom: 1rem;
+        }
+
+        .photo-section p {
+            font-size: 1.1rem;
+            text-align: center;
+            max-width: 80%;
+            line-height: 1.6;
+        }
+
+        /* Form section */
+        .col-md-6.form-section {
+            background-color: #ffffff;
+            padding: 3rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        h4 {
+            color: #0e0e59;
+            margin-bottom: 2rem;
+            text-align: center;
+            font-size: 1.8rem;
+            font-weight: 600;
+            font-family:'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        /* Input fields with no border and rounded edges */
+        .form-control {
+            border-radius: 50px;
+            background-color: #f0f0f0;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            font-size: 1rem;
+        }
+
+        .form-control:focus {
+            background-color: #d7d5d5;
+            box-shadow:#0e0e59;
+            
+        }
+
+        /* Enhanced login button */
+        .btn-primary {
+            background-color: #0e0e59;
+            border-color: #0e0e59;
+            font-size: 1.2rem;
+            padding: 0.50rem 1.5rem;
+            border-radius: 50px;
+            transition: background-color 0.3s ease, transform 0.3s ease;
+            font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+        }
+
+        .btn-primary:hover {
+            background-color: #131375;
+            border-color: #131375;
+            /*transform: scale(1.05); /* Slightly scale up on hover */
+        }
+
+        .btn-primary:focus, .btn-primary:active {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            outline: none;
+        }
+
+        .alert {
+            margin-top: 1rem;
+            font-size: 0.9rem;
+            text-align: center;
+        }
+
+        .sign-up {
+            font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+        }
+
+        .label{
+            font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+        }
+        .label1{
+            font-family:'Courier New', Courier, monospace
         }
     </style>
 </head>
 
-<body class="d-flex justify-content-center align-items-center vh-100 bg-light">
-    <div class="container d-flex justify-content-center align-items-center">
-        <div class="row rounded-3 overflow-hidden bg-white shadow-lg">
-            <div class="col-md-6 p-4 d-flex justify-content-center align-items-center">
-                <img style="width: 150px;" class="img rounded-circle" src="{% static 'images/logo/eduikshya-logo.png' %}" alt="Edu-Ikshya Logo">
+<body class="d-flex justify-content-center align-items-center vh-100">
+    <div class="container">
+        <div class="row rounded-3">
+            <!-- Photo Section -->
+            <div class="col-md-6 photo-section">
+                <img src="{% static 'images/logo/icon.png' %}" alt="Edu-Ikshya Logo">
+                <p class="label1">Welcome to Edu-Ikshya.<br>Enhance your learning experience!</p>
             </div>
-            <div class="col-md-6 p-5 d-flex flex-column justify-content-center align-items-center">
-                <h4 class="text-primary text-center mb-4">Login</h4>
+
+            <!-- Form Section -->
+            <div class="col-md-6 form-section">
+                <h4>Login</h4>
                 <form method="POST" class="w-100">
                     {% csrf_token %}
-                    <div class="form-group mb-3">
-                        <label for="login_username" class="form-label">Username:</label>
-                        {{form.username}}
+                    <div class="form-group">
+                        <label class="label">Username:</label>
+                        <input type="text" id="login_username" name="username" class="form-control" placeholder="Username" required>
                     </div>
-                    <div class="form-group mb-3">
-                        <label for="login_password" class="form-label">Password:</label>
-                        {{form.password}}
+                    <div class="form-group">
+                        <label class="label">Password:</label>
+                        <input type="password" id="login_password" name="password" class="form-control" placeholder="Password" required>
                     </div>
+                    <div class="form-group form-check">
+                        <input type="checkbox" class="form-check-input" id="remember_me" name="remember_me">
+                        <label class="form-check-label" for="remember_me">Remember Me</label>
+                    </div>
+
                     {% if form.non_field_errors %}
                     <div class="alert alert-danger" role="alert">
                         {{ form.non_field_errors }}
                     </div>
                     {% endif %}
                     <div class="d-grid">
-                        <button type="submit" class="btn btn-primary">Login</button>
+                        <button type="submit" class="btn btn-primary">Log in</button>
+                    </div>
+                    <br>
+                    <div class="form-group text-center">
+                        <label class="sign-up">Don't have an account? <a href="/register"><u>Sign up</a></label>
                     </div>
                 </form>
-
+            </div>
         </div>
     </div>
+
     <!-- Bootstrap JS and dependencies -->
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.2/dist/umd/popper.min.js"></script>
