@@ -11,6 +11,18 @@
                 <h6 class="text-muted">{{ course.course_id }}</h6>
             </div>
         </div>
+        
+        <!-- Display Error Messages -->
+        {% if messages %}
+        <div class="alert-container">
+            {% for message in messages %}
+                <div class="alert {% if message.tags == 'error' %}alert-danger{% elif message.tags == 'success' %}alert-success{% endif %}" role="alert" id="message_{{ forloop.counter }}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
         <form method="POST">
             {% csrf_token %}
             <div class="card shadow-sm mb-4">
@@ -20,32 +32,22 @@
                             <tr>
                                 <th>Registration No.</th>
                                 <th>Student Name</th>
-                                <th>Assignment Submission</th>
-                                <th>Marks</th>
+                                <th>Obtained Mark</th>
                                 <th>Actions</th>
                             </tr>
                         </thead>
                         <tbody>
-                            {% for student in students %}
+                            {% for item in students_with_marks %}
                             <tr>
-                                <td>{{ student.registration_number }}</td>
-                                <td>{{ student.first_name }} {{ student.last_name }}</td>
-                                <td>
-                                    <!-- Display assignment submissions here -->
-                                    {% for submission in student.submissions.all %}
-                                        <p class="mb-0">
-                                            {{ submission.assignment.title }} - Submitted on {{ submission.submitted_at|date:"d M Y" }}
-                                        </p>
-                                    {% empty %}
-                                        <p>No submissions</p>
-                                    {% endfor %}
+                                <td>{{ item.student.registration_number }}</td>
+                                <td>{{ item.student.first_name }} {{ item.student.last_name }}</td>
+                                <td class="fw-bold text-center">
+                                    <input type="number" name="marks_{{ item.student.id }}" class="form-control"
+                                           value="{% if item.marks_obtained %}{{ item.marks_obtained }}{% else %}0{% endif %}" step="0.01">
                                 </td>
-                                <td>
-                                    <input type="number" name="marks_{{ student.id }}" class="form-control" value="{{ student.marks|default_if_none:'' }}" step="0.01">
-                                </td>
-                                <td>
-                                    <button type="submit" name="save_{{ student.id }}" class="btn btn-sm btn-primary">Save</button>
-                                    <button type="button" class="btn btn-sm btn-warning">Edit</button>
+
+                                <td class="text-center">
+                                    <button type="submit" name="save_{{ item.student.id }}" class="btn btn-sm btn-primary">Save</button>
                                 </td>
                             </tr>
                             {% endfor %}
@@ -60,5 +62,20 @@
         </form>
     </div>
 </div>
+
+<script>
+    // Function to hide alerts after 5 seconds
+    document.addEventListener('DOMContentLoaded', function() {
+        var alerts = document.querySelectorAll('.alert');
+        alerts.forEach(function(alert) {
+            setTimeout(function() {
+                alert.style.opacity = '0';
+                setTimeout(function() {
+                    alert.style.display = 'none';
+                }, 500); // Wait for fade-out transition to complete
+            }, 5000); // 5 seconds
+        });
+    });
+</script>
 
 {% endblock %}

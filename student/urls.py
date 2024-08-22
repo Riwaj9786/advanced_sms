@@ -1,5 +1,7 @@
 from django.urls import path
 from student import views
+from django.conf import settings
+from django.conf.urls.static import static
 
 app_name = 'students'
 
@@ -8,6 +10,7 @@ urlpatterns = [
     path('logout/', views.user_logout, name='logout'),
     path('register/', views.user_register, name='user_register'),
     path('accounts/login/', views.session_expired, name='session_expired'),
+    path('students/', views.total_students, name='total_students'),
 
     # Views for Staff
     path('staff/<pk>/', views.staff_dashboard, name='staff_dashboard'),
@@ -18,10 +21,10 @@ urlpatterns = [
     path('staff/student/<pk>/', views.student_detail, name='student_detail'),
     path('staff/assignments/<pk>/submissions/', views.submission_view, name='submission_view'),
     path('marks/<pk>/', views.marks_dashboard, name='marks_dashboard'),
-    path('marks/<str:course_id>/<str:program_id>/<str:semester_id>/', views.marking_page, name='marking_page'),
+    path('marks/<course_id>/<program_id>/<semester_id>/', views.marking_page, name='marking_page'),
 
     #Views for student
     path('student/dashboard/<pk>/', views.student_dashboard, name='student_dashboard'),
     path('student/assignments/', views.student_assignment_view, name="student_assignments"),
     path('student/assignment/<pk>/', views.assignment_view, name="assignment_view"),
-]
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

@@ -37,13 +37,16 @@
     <!-- Statistics Cards -->
     <div class="row g-4 mb-4">
         <div class="col-sm-4">
-            <div class="card text-white bg-primary shadow-lg rounded-4">
-                <div class="card-body text-center">
-                    <h5 class="card-title mb-4">{% if user.is_superuser %}Total {% endif %}Students</h5>
-                    <h1 class="display-4 mb-0">{{ student_count }}</h1>
+            <a class="text-decoration-none" href="{% url 'students:total_students' %}">            
+                <div class="card text-white bg-primary shadow-lg rounded-4">
+                    <div class="card-body text-center">
+                        <h5 class="card-title mb-4">{% if user.is_superuser %}Total {% endif %}Students</h5>
+                        <h1 class="display-4 mb-0">{{ student_count }}</h1>
+                    </div>
                 </div>
-            </div>
+            </a>
         </div>
+        
         <div class="col-sm-4">
             <div class="card text-white bg-success shadow-lg rounded-4">
                 <div class="card-body text-center">

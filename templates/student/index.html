@@ -1,13 +1,13 @@
 <!DOCTYPE html>
 {% load static %}
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Edu-Ikshya</title>
-    <!-- Bootstrap CSS -->
+    <!-- Bootstrap 5.3 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <style>
         body {
@@ -19,12 +19,12 @@
             top: 0;
             width: 100%;
             z-index: 1030;
+            background-color: #007bff;
         }
 
         .side-navbar {
             position: fixed;
             top: 75px;
-            /* Height of the top navbar */
             bottom: 0;
             width: 200px;
             padding-top: 20px;
@@ -33,27 +33,25 @@
             flex-direction: column;
         }
 
+        .side-navbar .nav-link {
+            padding: 25px 30px; /* Adjust padding values as needed */
+    }
+
+
         .content {
             margin-top: 75px;
-            /* Height of the top navbar */
             margin-left: 200px;
-            /* Width of the side navbar */
             padding: 20px;
             width: calc(100% - 200px);
+            background-color: #f8f9fa;
         }
 
         .navbar-toggler {
             border: none;
-            /* Remove the border */
         }
 
-        .no-underline{
+        .no-underline {
             text-decoration: none;
-        }
-
-        .navbar-toggler-icon {
-            background-color: #fff;
-            /* White background color */
         }
 
         @media (max-width: 992px) {
@@ -63,107 +61,109 @@
 
             .content {
                 margin-left: 0;
-                margin-top: 75px;
-                /* Adjust if needed for smaller screens */
                 width: 100%;
             }
         }
 
-        @media (max-width: 768px) {
-            .content {
-                margin-top: 55px;
-            }
-
-            .navbar-toggler-icon {
-                background-color: #fff;
-                /* White background color */
-                border: none;
-                /* Remove border */
-                width: 1.5rem;
-                /* Adjust size */
-                height: 1.5rem;
-                /* Adjust size */
-            }
-
-            .navbar-nav.flex-row {
-                flex-direction: column;
-                align-items: center;
-            }
-
-            .navbar-nav.flex-row .nav-link {
-                padding: 1rem;
-            }
-
-            .profile-pic {
-                width: 35px;
-                height: 35px;
-                border-radius: 50%;
-                overflow: hidden;
-                margin-right: 1rem;
-            }
-
-            .profile-pic img {
-                width: 100%;
-                height: auto;
-            }
+        .profile-pic {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            overflow: hidden;
+            margin-right: 1rem;
         }
 
-    .text-decoration-none {
-        text-decoration: none !important;
-    }
-    .text-decoration-none:hover {
-        text-decoration: none !important;
-    }
+        .profile-pic img {
+            width: 100%;
+            height: auto;
+        }
+
+        .nav-link {
+            color: white;
+        }
+
+        .nav-link:hover {
+            background-color: #495057;
+        }
+
+        .top-navbar .nav-link:hover {
+            background-color: #3e9deb;
+        }
+
+        .side-navbar .nav-link.active {
+            background-color: #495057;
+            font-weight: bold;
+        }
+
+        .side-navbar .nav-link span {
+            margin-left: 10px;
+        }
+
+        .content {
+            background-color: #f8f9fa;
+            min-height: 100vh;
+        }
+
+        .navbar-toggler-icon {
+            background-image: none;
+            width: 1.5rem;
+            height: 1.5rem;
+            background-color: #ffffff;
+            border-radius: 0.25rem;
+        }
     </style>
 </head>
+
 <body>
     <!-- Top Navbar -->
     <nav class="navbar navbar-expand-lg navbar-light bg-primary top-navbar shadow-sm">
-        <a class="navbar-brand d-flex mx-5 align-items-center" href="{% url 'students:staff_dashboard' pk=user.pk %}">
-            <img class="img rounded-circle" src="{% static 'images/logo/eduikshya-logo.png' %}" alt="Edu-Ikshya Logo"
-                width="65" height="65" class="d-inline-block align-top">
-        </a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
-            aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
-            {% if user.is_authenticated %}
-            <ul class="navbar-nav ms-auto d-none d-lg-flex">
-                <li class="nav-item d-flex align-items-center">
-                    <div class="profile-pic d-flex mx-4 align-items-center">
-                        <img style="width: 40px;" class="img rounded-circle mx-2"
-                            src="{% static 'images/profile/images.png' %}">
-                        <p class="text-xs text-white mb-0">Welcome, {{ user.first_name }}</p>
-                    </div>
-                </li>
-
-                <li class="nav-item">
-                    <a class="nav-link text-white mx-2 p-2" href="{% url 'students:logout' %}">Logout</a>
-                </li>
-            </ul>
-            {% endif %}
+        <div class="container-fluid">
+            <a class="navbar-brand d-flex mx-5 align-items-center" href="{% url 'students:staff_dashboard' pk=user.pk %}">
+                <img src="{% static 'images/logo/eduikshya-logo.png' %}" alt="Edu-Ikshya Logo" width="50" height="50"
+                    class="d-inline-block rounded-circle">
+                <span class="ms-2 text-white">Edu-Ikshya</span>
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
+                {% if user.is_authenticated %}
+                <ul class="navbar-nav ms-auto d-none d-lg-flex align-items-center">
+                    <li class="nav-item mx-3">
+                        <div class="d-flex align-items-center">
+                            <div class="profile-pic">
+                                <img src="{% static 'images/profile/images.png' %}">
+                            </div>
+                            <p class="text-white mb-0">Welcome, {{ user.first_name }}</p>
+                        </div>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-white ms-3" href="{% url 'students:logout' %}">Logout</a>
+                    </li>
+                </ul>
+                {% endif %}
+            </div>
         </div>
     </nav>
 
-
     <!-- Side Navbar -->
-    <div class="side-navbar d-none d-lg-flex">
+    <div class="side-navbar d-none d-lg-flex flex-column">
         <nav class="nav flex-column w-100">
-            <a class="nav-link text-light p-4" href="{% url 'students:student_dashboard' pk=user.pk %}">
-                <i class="fas fa-tachometer-alt"></i> <span>Dashboard</span>
+            <a class="nav-link text-light mb-2 {% if request.resolver_match.url_name == 'student_dashboard' %}active{% endif %}" 
+                href="{% url 'students:student_dashboard' pk=user.pk %}">
+                <i class="fas fa-tachometer-alt me-2"></i> Dashboard
             </a>
-            <a class="nav-link text-light p-4" href="{% url 'students:student_assignments' %}">
-                <i class="fas fa-tasks"></i> <span>Assignments</span>
+            <a class="nav-link text-light mb-2 {% if request.resolver_match.url_name == 'student_assignments' %}active{% endif %}" 
+                href="{% url 'students:student_assignments' %}">
+                <i class="fas fa-tasks me-2"></i> Assignments
             </a>
-            <a class="nav-link text-light p-4" href="#">
-                <i class="fas fa-book"></i> <span>Marks</span>
+            <a class="nav-link text-light mb-2" href="#">
+                <i class="fas fa-book me-2"></i> Marks
             </a>
-            <div class="mt-auto">
-                <a class="nav-link text-light p-4" href="#">
-                    <i class="fas fa-cogs"></i> <span>Settings</span>
-                </a>
-            </div>
+            <a class="nav-link text-light mt-auto" href="#">
+                <i class="fas fa-cogs me-2"></i> Settings
+            </a>
         </nav>
     </div>
 
@@ -178,12 +178,14 @@
 
             {% block assignment_view %}
             {% endblock %}
+
+            {% block marks %}
+            {% endblock %}
         </div>
     </div>
 
     <!-- Bootstrap JS and dependencies -->
-    <script src=" https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.2/dist/umd/popper.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
+
 </html>

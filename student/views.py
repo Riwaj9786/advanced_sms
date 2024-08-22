@@ -1,3 +1,4 @@
+import os
 from django.shortcuts import render, get_object_or_404, redirect
 from django.http import HttpResponse, HttpResponseForbidden
 from django.contrib.auth import login, authenticate, logout
@@ -7,6 +8,7 @@ from student.forms import RegisterForm, LoginForm, AssignmentForm
 from django.contrib.auth.hashers import make_password
 from datetime import datetime
 from django.contrib import messages
+from django.conf import settings
 from django.core.files.storage import FileSystemStorage
 from django.urls import reverse
 
@@ -76,6 +78,24 @@ def user_register(request):
 
     return render(request, 'registration/signup.html', {'form': form})
 
+
+@login_required
+def total_students(request):
+    user = request.user
+    if user.is_superuser:
+        # Order students by registration number (descending) and then by first name (ascending)
+        students = Student.objects.all().order_by('registration_number', 'first_name')
+    else:
+        # Redirect non-superuser with an error message
+        messages.error(request, "You are not authorized to view this page.")
+        return redirect('home')  # Replace 'home' with the name of the page to redirect to
+
+    return render(request, 'staff/students.html', {
+        'students': students,
+    })
+
+
+
 @login_required
 def staff_dashboard(request, pk):
     teacher = get_object_or_404(User, pk=pk)
@@ -136,7 +156,8 @@ def student_lists(request, pk):
         return HttpResponseForbidden("You are not authorized!")
 
     course = request.GET.get('course')
-    students = Student.objects.filter(semester__programcourse__in=program_courses).distinct()
+    semester = request.GET.get('semester')
+    students = Student.objects.filter(semester__programcourse__in=program_courses).distinct().order_by('registration_number')
 
     if course:
         students = students.filter(semester__programcourse__course__course_name=course)
@@ -160,7 +181,7 @@ def student_lists(request, pk):
 def student_detail(request, pk):
     student = get_object_or_404(Student, pk=pk)
 
-    return render(request, 'student/student_detail.html', {'student': student})
+    return render(request, 'staff/student_detail.html', {'student': student})
 
 @login_required
 def classes_view(request, pk):
@@ -231,53 +252,90 @@ def student_assignment_view(request):
             deadline__lte=datetime.now()
         ).order_by('-deadline')
 
-    return render(request, 'student/assignment.html', {
-        'assignments': assignments,
-        'inactive_assignments': inactive_assignments
-    })
+        # Check which assignments have been submitted by the student
+        submissions = Submission.objects.filter(student=user, assignment__in=assignments)
+        submission_status = {
+            assignment.pk: submissions.filter(assignment=assignment).exists()
+            for assignment in assignments
+        }
+
+        return render(request, 'student/assignment.html', {
+            'assignments': assignments,
+            'inactive_assignments': inactive_assignments,
+            'submission_status': submission_status
+        })
+
+    else:
+        # Handle non-student users
+        messages.error(request, "You do not have permission to view this page.")
+        return redirect('home')
+
 
 @login_required
 def assignment_view(request, pk):
-    assignment = get_object_or_404(Assignment, pk=pk)
+    if request.user.is_student:
+        assignment = get_object_or_404(Assignment, pk=pk)
+        submission, created = Submission.objects.get_or_create(assignment=assignment, student=request.user)
 
-    if request.method == "POST":
-        if assignment.accepted_file_type == "pdf":
-            if 'file' in request.FILES:
-                file = request.FILES['file']
-                submission = Submission.objects.create(
-                    assignment=assignment,
-                    student=request.user,
-                    file=file,
-                    submitted_at=datetime.now()
-                )
-                submission.save()
-                messages.success(request, "Your PDF assignment has been submitted successfully!")
-                return redirect('students:student_assignments')
-            else:
-                messages.error(request, "Please upload a valid PDF file.")
+        if request.method == "POST":
+            if assignment.accepted_file_type == "pdf":
+                if 'file' in request.FILES:
+                    file = request.FILES['file']
+                    # Replace existing file if already submitted
+                    if submission.file and submission.file.name != file.name:
+                        # Delete the old file
+                        fs = FileSystemStorage()
+                        fs.delete(submission.file.name)
+                    submission.file = file
+                    submission.submitted_at = datetime.now()
+                    submission.is_submitted = True
+                    submission.is_checked = True
+                    submission.save()
+                    messages.success(request, "Your PDF assignment has been submitted successfully!")
+                    return redirect('students:assignment_view', pk=pk)
+                else:
+                    messages.error(request, "Please upload a valid PDF file.")
 
-        elif assignment.accepted_file_type == "text":
-            text_content = request.POST.get('text')
-            if text_content:
-                file_name = f"{request.user.username}_assignment_{assignment.pk}.txt"
-                file_path = f"submissions/{file_name}/"
-                fs = FileSystemStorage()
-                with fs.open(file_path, 'w') as f:
-                    f.write(text_content)
+            elif assignment.accepted_file_type == "text":
+                text_content = request.POST.get('text')
+                if text_content:
+                    # Define the directory for this assignment
+                    assignment_directory = os.path.join(settings.MEDIA_ROOT, f"submissions/text/assignment_{assignment.pk}/")
+                    
+                    # Create the directory if it doesn't exist
+                    if not os.path.exists(assignment_directory):
+                        os.makedirs(assignment_directory)
 
-                submission = Submission.objects.create(
-                    assignment=assignment,
-                    student=request.user,
-                    file=file_path,
-                    submitted_at=datetime.now()
-                )
-                submission.save()
-                messages.success(request, "Your Assignment has been submitted successfully!")
-                return redirect('students:student_assignments')
-            else:
-                messages.error(request, "Please enter the text for your assignment.")
+                    # File path within the assignment directory
+                    file_name = f"{request.user.username}_assignment_{assignment.pk}.txt"
+                    file_path = os.path.join(assignment_directory, file_name)
 
-    return render(request, 'student/assignment_view.html', {'assignment': assignment})
+                    # Replace existing text file if already submitted
+                    if submission.file and submission.file.name != file_path:
+                        # Delete the old file
+                        fs = FileSystemStorage()
+                        fs.delete(submission.file.name)
+
+                    # Save the new file
+                    with open(file_path, 'w') as f:
+                        f.write(text_content)
+
+                    submission.file = file_path.replace(settings.MEDIA_ROOT + '/', '')  # store relative path
+                    submission.submitted_at = datetime.now()
+                    submission.is_submitted = True
+                    submission.is_checked = True
+                    submission.save()
+                    messages.success(request, "Your assignment has been submitted successfully!")
+                    return redirect('students:student_assignments')
+                else:
+                    messages.error(request, "Please enter the text for your assignment.")
+
+        return render(request, 'student/assignment_view.html', {'assignment': assignment, 'submission': submission})
+    else:
+        # Handle non-student users
+        messages.error(request, "You do not have permission to view this page.")
+        return redirect('home')
+
 
 @login_required
 def submission_view(request, pk):
@@ -316,57 +374,93 @@ def marks_dashboard(request, pk):
 
 @login_required
 def marking_page(request, program_id, course_id, semester_id):
-    # Retrieve the specific course and semester
+    marks_dict = {}
+
+    # Retrieve the specific course, program, and semester
     course = get_object_or_404(Course, course_id=course_id)
     program = get_object_or_404(Program, program_id=program_id)
     semester = get_object_or_404(Semester, semester_id=semester_id)
 
-    # Retrieve the ProgramCourse for the given course and semester
+    # Retrieve the ProgramCourse for the given course, program, and semester
     program_course = get_object_or_404(ProgramCourse, program=program, course=course, semester=semester)
-    
+
     # Filter students who are enrolled in the specific course and semester
-    students = Student.objects.filter(
-        program=program,
-        semester=semester
-    ).distinct()
+    students = Student.objects.filter(program=program, semester=semester).distinct().order_by('first_name')
+
+    # Initialize marks dictionary for each student
+    for student in students:
+        marks = Marks.objects.filter(course=course, student=student).first()
+        marks_dict[student.id] = marks.marks_obtained if marks else None
 
     if request.method == 'POST':
+        errors = []
         if 'submit_all' in request.POST:
             for student in students:
-                marks = request.POST.get(f'marks_{student.id}')
-                if marks:
-                    # Check if marks already exist; if not, create a new entry
-                    mark_entry, created = Marks.objects.get_or_create(
-                        student=student,
-                        course=course,
-                        defaults={'marks_obtained': float(marks), 'max_marks': 100.00}  # Default max_marks if not specified
-                    )
-                    if not created:
-                        mark_entry.marks_obtained = float(marks)
-                        mark_entry.save()
-            messages.success(request, 'All marks have been updated successfully.')
+                marks_value = request.POST.get(f'marks_{student.id}')
+                if marks_value:
+                    try:
+                        marks_value = float(marks_value)
+                        if 0 <= marks_value <= 50:
+                            mark_entry, created = Marks.objects.get_or_create(
+                                student=student,
+                                course=course,
+                                defaults={'marks_obtained': marks_value, 'max_marks': 50.00}
+                            )
+                            if not created:
+                                mark_entry.marks_obtained = marks_value
+                                mark_entry.save()
+                        else:
+                            errors.append(f"Marks for {student.first_name} {student.last_name} must be between 0 and 50.")
+                    except ValueError:
+                        errors.append(f"Invalid marks value for {student.first_name} {student.last_name}.")
+
+            if not errors:
+                messages.success(request, 'All marks have been updated successfully.')
+            else:
+                for error in errors:
+                    messages.error(request, error)
 
         else:
-            # Handle individual marks saving
             for student in students:
-                mark_key = f'save_{student.id}'
-                if mark_key in request.POST:
-                    marks = request.POST.get(f'marks_{student.id}')
-                    if marks:
-                        mark_entry, created = Marks.objects.get_or_create(
-                            student=student,
-                            course=course,
-                            defaults={'marks_obtained': float(marks), 'max_marks': 100.00}  # Default max_marks if not specified
-                        )
-                        if not created:
-                            mark_entry.marks_obtained = float(marks)
-                            mark_entry.save()
-                        messages.success(request, f'Marks for {student.first_name} {student.last_name} saved successfully.')
+                if f'save_{student.id}' in request.POST:
+                    marks_value = request.POST.get(f'marks_{student.id}')
+                    if marks_value:
+                        try:
+                            marks_value = float(marks_value)
+                            if 0 <= marks_value <= 50:
+                                mark_entry, created = Marks.objects.get_or_create(
+                                    student=student,
+                                    course=course,
+                                    defaults={'marks_obtained': marks_value, 'max_marks': 50.00}
+                                )
+                                if not created:
+                                    mark_entry.marks_obtained = marks_value
+                                    mark_entry.save()
+                                messages.success(request, f'Marks for {student.first_name} {student.last_name} saved successfully.')
+                            else:
+                                errors.append(f"Marks for {student.first_name} {student.last_name} must be between 0 and 50.")
+                        except ValueError:
+                            errors.append(f"Invalid marks value for {student.first_name} {student.last_name}.")
+                    
+            if not errors:
+                messages.success(request, 'Marks have been updated successfully.')
+            else:
+                for error in errors:
+                    messages.error(request, error)
 
         return redirect('students:marking_page', course_id=course_id, program_id=program_id, semester_id=semester_id)
 
+    # Annotate students with their marks
+    students_with_marks = []
+    for student in students:
+        marks_obtained = marks_dict.get(student.id, None)
+        students_with_marks.append({
+            'student': student,
+            'marks_obtained': marks_obtained
+        })
+
     return render(request, 'staff/marking_page.html', {
         'course': course,
-        'students': students,
+        'students_with_marks': students_with_marks,
         'program_course': program_course,
     })

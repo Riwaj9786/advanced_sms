@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+{% extends 'staff/index.html' %}
+
+{% load static %}
+
+{% block student_detail %}
+<div class="container mt-4">
+    <a class="text-decoration-none text-primary fw-bold" href="{% url 'students:student_lists' pk=user.pk %}">
+        &lt; Back to Student List
+    </a>
+</div>
+
+<div class="container mt-4">
+    <div class="card shadow-lg border-0 rounded-4">
+        <div class="card-body p-5">
+            <div class="row align-items-center">
+                <!-- Profile Picture/Initials -->
+                <div class="col-md-3 text-center mb-4 mb-md-0">
+                    <div class="rounded-circle bg-primary d-flex justify-content-center align-items-center mx-auto shadow-lg"
+                         style="width: 150px; height: 150px;">
+                        <p class="text-white display-3 mb-0">{{ student.first_name|slice:":1" }}{{ student.last_name|slice:":1" }}</p>
+                    </div>
+                </div>
+                
+                <!-- Student Information -->
+                <div class="col-md-5">
+                    <h2 class="text-primary fw-bold">{{ student.first_name }} {{ student.last_name }}</h2>
+                    <p class="text-muted fs-5">{{ student.registration_number }}</p>
+                    <p class="text-muted fs-5">{{student.program.program_name}} | Semester: {{student.semester.semester}}</p>
+                </div>
+                
+                <!-- Status -->
+                <div class="col-md-3 text-md-end text-center">
+                    <div class="bg-light p-3 rounded-3 shadow-sm">
+                        <h6 class="text-secondary">Status</h6>
+                        <h5 class="text-success fw-bold">
+                            Student
+                        </h5>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

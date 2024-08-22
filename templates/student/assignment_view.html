@@ -5,66 +5,96 @@
 
 {% block assignment_view %}
 <div class="container mt-5">
+    <!-- Assignment Details Card -->
     <div class="row">
         <div class="col-md-12">
-            <div class="card shadow-lg" style="border-radius: 15px;">
-                <div class="card-body">
+            <div class="card shadow-lg border-0" style="border-radius: 15px;">
+                <div class="card-body p-4">
+                    <!-- Assignment Title -->
                     <h3 class="card-title text-uppercase text-primary fw-bold" style="font-family: 'Arial', sans-serif;">
                         {{ assignment.title }}
                     </h3>
-                    <p class="card-text text-secondary text-xs fw-light" style="font-family: 'Courier New', monospace;">
+                    <!-- Assigned Class -->
+                    <p class="card-text text-muted fst-italic mb-4" style="font-family: 'Courier New', monospace;">
                         {{ assignment.assigned_class.course }}
                     </p>
+                    <!-- Assignment Metadata -->
                     <div class="row my-3">
                         <div class="col-sm-6">
                             <p class="card-text">
-                                <span class="small text-muted">Deadline:</span>
-                                <span class="h5 mx-3 text-success">
+                                <span class="text-muted">Deadline:</span>
+                                <span class="h5 mx-2 text-success">
                                     {{ assignment.deadline|date:"d-M" }}
                                 </span>
                             </p>
                         </div>
                         <div class="col-sm-6 text-end">
-                            <p class="card-text text-secondary">
-                                <span class="small text-muted">Created By: {{ assignment.created_by }}</span> | 
-                                <span class="small text-muted">Worth: {% if assignment.worth %} {{assignment.worth}} {% else %} 0 {% endif %}</span>
+                            <p class="card-text">
+                                <span class="text-muted">Created By:</span> 
+                                {{ assignment.created_by }}
+                                <span class="mx-2">|</span>
+                                <span class="text-muted">Worth:</span> 
+                                {% if assignment.worth %} 
+                                    {{ assignment.worth }} 
+                                {% else %} 
+                                    0 
+                                {% endif %}
+                                <span class="mx-2">|</span>
+                                <span class="text-muted">Status:</span>
+                                {% if submission %}
+                                    {% if submission.is_submitted %}
+                                        <span class="badge bg-success">Submitted</span>
+                                        <!-- Link to view the submitted file -->
+                                        <div class="mt-2">
+                                            <a href="{{ submission.file.url }}" class="btn btn-info btn-sm" target="_blank">View Submission</a>
+                                        </div>
+                                    {% else %}
+                                        <span class="badge bg-danger">Not Submitted</span>
+                                    {% endif %}
+                                {% else %}
+                                    <span class="badge bg-danger">Not Submitted</span>
+                                {% endif %}
                             </p>
                         </div>
                     </div>
+                    <!-- Assignment Description -->
                     {% if assignment.description %}
-                    <div>
-                        <h5 class="mt-5">Assignment Description</h5>
-                        <p>{{ assignment.description }}</p>
+                    <div class="mt-4">
+                        <h5 class="fw-bold">Assignment Description</h5>
+                        <p class="text-secondary">{{ assignment.description }}</p>
                     </div>
                     {% endif %}
                 </div>
             </div>
         </div>
     </div>
+
     {% if user.is_authenticated %}
+    <!-- Assignment Submission Form -->
     <div class="row mt-5">
         <div class="col-md-12">
-            <div class="card shadow-lg" style="border-radius: 15px;">
-                <div class="card-body">
-                    <h4 class="card-title text-primary">Submit Your Assignment</h4>
+            <div class="card shadow-lg border-0" style="border-radius: 15px;">
+                <div class="card-body p-4">
+                    <h4 class="card-title text-primary mb-4">Submit Your Assignment</h4>
                     <form method="POST" enctype="multipart/form-data">
                         {% csrf_token %}
                         
+                        <!-- File Submission -->
                         {% if assignment.accepted_file_type == "pdf" %}
-                        <!-- PDF Submission -->
-                        <div class="mb-3">
-                            <label for="file" class="form-label">Upload your File</label>
+                        <div class="mb-4">
+                            <label for="file" class="form-label fw-bold">Upload your File (PDF)</label>
                             <input type="file" class="form-control" id="file" name="file" accept="application/pdf" required>
                         </div>
                         {% elif assignment.accepted_file_type == "text" %}
                         <!-- Text Submission -->
-                        <div class="mb-3">
-                            <label for="text" class="form-label">Enter Your Assignment</label>
-                            <textarea placeholder="Enter your assignment" class="form-control" id="text" name="text" rows="10" required></textarea>
+                        <div class="mb-4">
+                            <label for="text" class="form-label fw-bold">Enter Your Assignment</label>
+                            <textarea placeholder="Enter your assignment here..." class="form-control" id="text" name="text" rows="12" required></textarea>
                         </div>
                         {% endif %}
                         
-                        <button type="submit" class="btn btn-primary">Submit</button>
+                        <!-- Submit Button -->
+                        <button type="submit" class="btn btn-primary btn-lg">Submit</button>
                     </form>
                 </div>
             </div>
@@ -74,8 +104,9 @@
     
 </div>
 
+<!-- CKEditor Script for Text Areas -->
 <script src="https://cdn.ckeditor.com/4.16.0/standard/ckeditor.js"></script>
 <script>
-    CKEDITOR.replace('editor');
+    CKEDITOR.replace('text');
 </script>
 {% endblock %}
