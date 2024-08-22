@@ -11,8 +11,8 @@
         <div class="row g-4">
             {% if assignments %}
                 {% for assignment in assignments %}
-                <a class="text-decoration-none" href="{% url 'students:assignment_view' pk=assignment.pk %}">
-                    <div class="col-md-6 col-lg-4">
+                <div class="col-md-4 col-lg-4">
+                    <a class="text-decoration-none" href="{% url 'students:assignment_view' pk=assignment.pk %}">
                         <div class="card h-100 shadow-sm border-primary">
                             <div class="card-body">
                                 <h5 class="card-title text-primary">{{ assignment.title }}</h5>
@@ -24,8 +24,8 @@
                                 <p class="text-muted">Created By: {{ assignment.created_by }}</p>
                             </div>
                         </div>
-                    </div>
-                </a>
+                    </a>
+                </div>
                 {% endfor %}
             {% else %}
                 <div class="alert alert-warning text-center" role="alert">

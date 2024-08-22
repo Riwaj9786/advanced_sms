@@ -1,3 +1,4 @@
+import os
 from django.shortcuts import render, get_object_or_404, redirect
 from django.http import HttpResponse, HttpResponseForbidden
 from django.contrib.auth import login, authenticate, logout
@@ -7,6 +8,7 @@ from student.forms import RegisterForm, LoginForm, AssignmentForm
 from django.contrib.auth.hashers import make_password
 from datetime import datetime
 from django.contrib import messages
+from django.conf import settings
 from django.core.files.storage import FileSystemStorage
 from django.urls import reverse
 
@@ -290,31 +292,40 @@ def assignment_view(request, pk):
                     submission.is_checked = True
                     submission.save()
                     messages.success(request, "Your PDF assignment has been submitted successfully!")
-                    return redirect('students:assignment_view',)
+                    return redirect('students:assignment_view', pk=pk)
                 else:
                     messages.error(request, "Please upload a valid PDF file.")
 
             elif assignment.accepted_file_type == "text":
                 text_content = request.POST.get('text')
                 if text_content:
+                    # Define the directory for this assignment
+                    assignment_directory = os.path.join(settings.MEDIA_ROOT, f"submissions/text/assignment_{assignment.pk}/")
+                    
+                    # Create the directory if it doesn't exist
+                    if not os.path.exists(assignment_directory):
+                        os.makedirs(assignment_directory)
+
+                    # File path within the assignment directory
                     file_name = f"{request.user.username}_assignment_{assignment.pk}.txt"
-                    file_path = f"submissions/{file_name}/"
-                    fs = FileSystemStorage()
+                    file_path = os.path.join(assignment_directory, file_name)
 
                     # Replace existing text file if already submitted
                     if submission.file and submission.file.name != file_path:
                         # Delete the old file
+                        fs = FileSystemStorage()
                         fs.delete(submission.file.name)
 
-                    with fs.open(file_path, 'w') as f:
+                    # Save the new file
+                    with open(file_path, 'w') as f:
                         f.write(text_content)
 
-                    submission.file = file_path
+                    submission.file = file_path.replace(settings.MEDIA_ROOT + '/', '')  # store relative path
                     submission.submitted_at = datetime.now()
                     submission.is_submitted = True
                     submission.is_checked = True
                     submission.save()
-                    messages.success(request, "Your Assignment has been submitted successfully!")
+                    messages.success(request, "Your assignment has been submitted successfully!")
                     return redirect('students:student_assignments')
                 else:
                     messages.error(request, "Please enter the text for your assignment.")
