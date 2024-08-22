@@ -1,8 +1,7 @@
 */__pycache__/*
-*.pyc
+*.pyc 
 documents/files_to_check_plagiarism_with/*
 media/files/submissions/*
 *.DS_Store
 .venv/*
 .venv
-db.sqlite3
