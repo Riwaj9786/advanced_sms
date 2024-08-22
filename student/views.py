@@ -136,6 +136,7 @@ def student_lists(request, pk):
         return HttpResponseForbidden("You are not authorized!")
 
     course = request.GET.get('course')
+    semester = request.GET.get('semester')
     students = Student.objects.filter(semester__programcourse__in=program_courses).distinct().order_by('registration_number')
 
     if course:
@@ -231,53 +232,81 @@ def student_assignment_view(request):
             deadline__lte=datetime.now()
         ).order_by('-deadline')
 
-    return render(request, 'student/assignment.html', {
-        'assignments': assignments,
-        'inactive_assignments': inactive_assignments
-    })
+        # Check which assignments have been submitted by the student
+        submissions = Submission.objects.filter(student=user, assignment__in=assignments)
+        submission_status = {
+            assignment.pk: submissions.filter(assignment=assignment).exists()
+            for assignment in assignments
+        }
+
+        return render(request, 'student/assignment.html', {
+            'assignments': assignments,
+            'inactive_assignments': inactive_assignments,
+            'submission_status': submission_status
+        })
+
+    else:
+        # Handle non-student users
+        messages.error(request, "You do not have permission to view this page.")
+        return redirect('home')
+
 
 @login_required
 def assignment_view(request, pk):
-    assignment = get_object_or_404(Assignment, pk=pk)
+    if request.user.is_student:
+        assignment = get_object_or_404(Assignment, pk=pk)
+        submission, created = Submission.objects.get_or_create(assignment=assignment, student=request.user)
 
-    if request.method == "POST":
-        if assignment.accepted_file_type == "pdf":
-            if 'file' in request.FILES:
-                file = request.FILES['file']
-                submission = Submission.objects.create(
-                    assignment=assignment,
-                    student=request.user,
-                    file=file,
-                    submitted_at=datetime.now()
-                )
-                submission.save()
-                messages.success(request, "Your PDF assignment has been submitted successfully!")
-                return redirect('students:student_assignments')
-            else:
-                messages.error(request, "Please upload a valid PDF file.")
+        if request.method == "POST":
+            if assignment.accepted_file_type == "pdf":
+                if 'file' in request.FILES:
+                    file = request.FILES['file']
+                    # Replace existing file if already submitted
+                    if submission.file and submission.file.name != file.name:
+                        # Delete the old file
+                        fs = FileSystemStorage()
+                        fs.delete(submission.file.name)
+                    submission.file = file
+                    submission.submitted_at = datetime.now()
+                    submission.is_submitted = True
+                    submission.is_checked = True
+                    submission.save()
+                    messages.success(request, "Your PDF assignment has been submitted successfully!")
+                    return redirect('students:assignment_view',)
+                else:
+                    messages.error(request, "Please upload a valid PDF file.")
 
-        elif assignment.accepted_file_type == "text":
-            text_content = request.POST.get('text')
-            if text_content:
-                file_name = f"{request.user.username}_assignment_{assignment.pk}.txt"
-                file_path = f"submissions/{file_name}/"
-                fs = FileSystemStorage()
-                with fs.open(file_path, 'w') as f:
-                    f.write(text_content)
+            elif assignment.accepted_file_type == "text":
+                text_content = request.POST.get('text')
+                if text_content:
+                    file_name = f"{request.user.username}_assignment_{assignment.pk}.txt"
+                    file_path = f"submissions/{file_name}/"
+                    fs = FileSystemStorage()
 
-                submission = Submission.objects.create(
-                    assignment=assignment,
-                    student=request.user,
-                    file=file_path,
-                    submitted_at=datetime.now()
-                )
-                submission.save()
-                messages.success(request, "Your Assignment has been submitted successfully!")
-                return redirect('students:student_assignments')
-            else:
-                messages.error(request, "Please enter the text for your assignment.")
+                    # Replace existing text file if already submitted
+                    if submission.file and submission.file.name != file_path:
+                        # Delete the old file
+                        fs.delete(submission.file.name)
 
-    return render(request, 'student/assignment_view.html', {'assignment': assignment})
+                    with fs.open(file_path, 'w') as f:
+                        f.write(text_content)
+
+                    submission.file = file_path
+                    submission.submitted_at = datetime.now()
+                    submission.is_submitted = True
+                    submission.is_checked = True
+                    submission.save()
+                    messages.success(request, "Your Assignment has been submitted successfully!")
+                    return redirect('students:student_assignments')
+                else:
+                    messages.error(request, "Please enter the text for your assignment.")
+
+        return render(request, 'student/assignment_view.html', {'assignment': assignment, 'submission': submission})
+    else:
+        # Handle non-student users
+        messages.error(request, "You do not have permission to view this page.")
+        return redirect('home')
+
 
 @login_required
 def submission_view(request, pk):
@@ -335,34 +364,60 @@ def marking_page(request, program_id, course_id, semester_id):
         marks_dict[student.id] = marks.marks_obtained if marks else None
 
     if request.method == 'POST':
+        errors = []
         if 'submit_all' in request.POST:
             for student in students:
                 marks_value = request.POST.get(f'marks_{student.id}')
                 if marks_value:
-                    mark_entry, created = Marks.objects.get_or_create(
-                        student=student,
-                        course=course,
-                        defaults={'marks_obtained': float(marks_value), 'max_marks': 100.00}
-                    )
-                    if not created:
-                        mark_entry.marks_obtained = float(marks_value)
-                        mark_entry.save()
-            messages.success(request, 'All marks have been updated successfully.')
+                    try:
+                        marks_value = float(marks_value)
+                        if 0 <= marks_value <= 50:
+                            mark_entry, created = Marks.objects.get_or_create(
+                                student=student,
+                                course=course,
+                                defaults={'marks_obtained': marks_value, 'max_marks': 50.00}
+                            )
+                            if not created:
+                                mark_entry.marks_obtained = marks_value
+                                mark_entry.save()
+                        else:
+                            errors.append(f"Marks for {student.first_name} {student.last_name} must be between 0 and 50.")
+                    except ValueError:
+                        errors.append(f"Invalid marks value for {student.first_name} {student.last_name}.")
+
+            if not errors:
+                messages.success(request, 'All marks have been updated successfully.')
+            else:
+                for error in errors:
+                    messages.error(request, error)
 
         else:
             for student in students:
                 if f'save_{student.id}' in request.POST:
                     marks_value = request.POST.get(f'marks_{student.id}')
                     if marks_value:
-                        mark_entry, created = Marks.objects.get_or_create(
-                            student=student,
-                            course=course,
-                            defaults={'marks_obtained': float(marks_value), 'max_marks': 100.00}
-                        )
-                        if not created:
-                            mark_entry.marks_obtained = float(marks_value)
-                            mark_entry.save()
-                        messages.success(request, f'Marks for {student.first_name} {student.last_name} saved successfully.')
+                        try:
+                            marks_value = float(marks_value)
+                            if 0 <= marks_value <= 50:
+                                mark_entry, created = Marks.objects.get_or_create(
+                                    student=student,
+                                    course=course,
+                                    defaults={'marks_obtained': marks_value, 'max_marks': 50.00}
+                                )
+                                if not created:
+                                    mark_entry.marks_obtained = marks_value
+                                    mark_entry.save()
+                                messages.success(request, f'Marks for {student.first_name} {student.last_name} saved successfully.')
+                            else:
+                                errors.append(f"Marks for {student.first_name} {student.last_name} must be between 0 and 50.")
+                        except ValueError:
+                            errors.append(f"Invalid marks value for {student.first_name} {student.last_name}.")
+                    
+            if not errors:
+                messages.success(request, 'Marks have been updated successfully.')
+            else:
+                for error in errors:
+                    messages.error(request, error)
 
         return redirect('students:marking_page', course_id=course_id, program_id=program_id, semester_id=semester_id)
 

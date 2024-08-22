@@ -39,6 +39,21 @@
                                 {% else %} 
                                     0 
                                 {% endif %}
+                                <span class="mx-2">|</span>
+                                <span class="text-muted">Status:</span>
+                                {% if submission %}
+                                    {% if submission.is_submitted %}
+                                        <span class="badge bg-success">Submitted</span>
+                                        <!-- Link to view the submitted file -->
+                                        <div class="mt-2">
+                                            <a href="{{ submission.file.url }}" class="btn btn-info btn-sm" target="_blank">View Submission</a>
+                                        </div>
+                                    {% else %}
+                                        <span class="badge bg-danger">Not Submitted</span>
+                                    {% endif %}
+                                {% else %}
+                                    <span class="badge bg-danger">Not Submitted</span>
+                                {% endif %}
                             </p>
                         </div>
                     </div>

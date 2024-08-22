@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import User, Assignment, Program, Semester, Student, Course, Submission, ProgramCourse, Marks
+from .models import User, Program, Student, Submission, Course, ProgramCourse, Marks
 from .admin_site import custom_admin_site  # Import from the correct location
 from django import forms
 
@@ -24,10 +24,8 @@ class CustomUserAdmin(admin.ModelAdmin):
 
 custom_admin_site.register(User, CustomUserAdmin)
 custom_admin_site.register(Program)
-custom_admin_site.register(Semester)
 custom_admin_site.register(Student)
 custom_admin_site.register(Course)
 custom_admin_site.register(Marks)
-custom_admin_site.register(Assignment)
 custom_admin_site.register(Submission)
 custom_admin_site.register(ProgramCourse, ProgramCourseAdmin)

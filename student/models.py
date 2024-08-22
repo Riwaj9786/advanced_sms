@@ -4,6 +4,7 @@ from django.db import models
 from django.contrib.auth.models import User, AbstractUser
 from django.conf import settings
 from django.utils.text import slugify
+from django.core.validators import MinValueValidator, MaxValueValidator
 
 class Program(models.Model):
     program_id = models.CharField(max_length=12, unique=True)
@@ -101,14 +102,22 @@ class ProgramCourse(models.Model):
 class Marks(models.Model):
     student = models.ForeignKey(Student, on_delete=models.CASCADE)
     course = models.ForeignKey(Course, on_delete=models.CASCADE)
-    marks_obtained = models.DecimalField(max_digits=5, decimal_places=2)
-    max_marks = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True)
+    marks_obtained = models.DecimalField(
+        max_digits=5, 
+        decimal_places=2, 
+        validators=[MinValueValidator(0), MaxValueValidator(50)]
+    )
+    max_marks = models.DecimalField(
+        max_digits=5, 
+        decimal_places=2, 
+        default=50, 
+        null=True, 
+        blank=True
+    )
     grade = models.CharField(max_length=2, blank=True, null=True)
 
     def __str__(self):
         return f"{self.student.first_name or self.student.user.username} - {self.course.course_name}"
-
-
 
 # Model for Assignment
 class Assignment(models.Model):
@@ -152,7 +161,8 @@ class Submission(models.Model):
     file = models.FileField(upload_to='files/submissions/')
     text = models.TextField(null=True, blank=True)
     submitted_at = models.DateTimeField(auto_now_add=True)
-    is_checked = models.BooleanField(default=False)  # To mark if the submission has been checked for plagiarism
+    is_checked = models.BooleanField(default=False)
+    is_submitted = models.BooleanField(default=False)
 
     def __str__(self):
         return f"{self.student.username} - {self.assignment.title}"
