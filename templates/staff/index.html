@@ -118,10 +118,11 @@
     <!-- Top Navbar -->
     <nav class="navbar navbar-expand-lg top-navbar shadow-sm">
         <a class="navbar-brand d-flex mx-5 align-items-center" href="{% url 'students:staff_dashboard' pk=user.pk %}">
-            <img class="rounded-circle" src="{% static 'images/logo/eduikshya-logo.png' %}" alt="Edu-Ikshya Logo"
-                width="50" height="50">
-            <span class="ms-3 text-white">Edu-Ikshya</span>
+            <img class="rounded-circle" src="{% static 'images/logo/icon.png' %}" alt="Edu-Ikshya Logo"
+                 width="60" height="60">
+            <span class="ms-3 text-white">edu-sanchal</span>
         </a>
+        
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
             aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
@@ -132,7 +133,7 @@
                 <li class="nav-item mx-3">
                     <div class="d-flex align-items-center">
                         <div class="profile-pic">
-                            <img src="{% static 'images/profile/images.png' %}">
+                            <img src="{% static 'images/profile/images.png' %}" width="25px" height="25px">
                         </div>
                         <p class="text-white mb-0">Welcome, {{ user.first_name }}</p>
                     </div>

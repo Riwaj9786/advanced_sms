@@ -3,8 +3,8 @@ from django.urls import path
 from django.shortcuts import render
 
 class CustomAdminSite(AdminSite):
-    site_header = 'Edu-Ikshya: Admin Portal'
-    site_title = 'Edu-Ikshya: School of Engineering'
+    site_header = 'edu-sanchal: Admin Portal'
+    site_title = 'edu-ikshya: School of Engineering'
     index_title = 'Welcome to the Admin Portal'
 
     def get_urls(self):

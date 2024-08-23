@@ -43,6 +43,13 @@ def split_sentences(text):
     sentences = re.split(r'(?<!\w\.\w.)(?<![A-Z][a-z]\.)(?<=\.|\?)\s', text)
     return [sentence.strip() for sentence in sentences if sentence.strip()]
 
+
+
+def check_plagiarism(file1, file2):
+    score = SequenceMatcher(None, file1, file2).ratio() 
+    return int(score*100) 
+
+
 # def calculate_plagiarism_score(texts):
 #     vectorizer = TfidfVectorizer().fit_transform(texts)  
 #     cosine_matrix = cosine_similarity(vectorizer)  
@@ -73,8 +80,3 @@ def split_sentences(text):
 # folder_path = 'Assignment'
 # plagiarism_results = check_plagiarism(folder_path)
 # print(plagiarism_results)
-
-
-def check_plagiarism(file1, file2):
-    score = SequenceMatcher(None, file1, file2).ratio() 
-    return int(score*100) 
