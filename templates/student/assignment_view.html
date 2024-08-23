@@ -61,7 +61,7 @@
                     {% if assignment.description %}
                     <div class="mt-4">
                         <h5 class="fw-bold">Assignment Description</h5>
-                        <p class="text-secondary">{{ assignment.description }}</p>
+                        <p class="text-secondary">{{ assignment.description|linebreaks }}</p>
                     </div>
                     {% endif %}
                 </div>
@@ -80,18 +80,10 @@
                         {% csrf_token %}
                         
                         <!-- File Submission -->
-                        {% if assignment.accepted_file_type == "pdf" %}
                         <div class="mb-4">
                             <label for="file" class="form-label fw-bold">Upload your File (PDF)</label>
                             <input type="file" class="form-control" id="file" name="file" accept="application/pdf" required>
                         </div>
-                        {% elif assignment.accepted_file_type == "text" %}
-                        <!-- Text Submission -->
-                        <div class="mb-4">
-                            <label for="text" class="form-label fw-bold">Enter Your Assignment</label>
-                            <textarea placeholder="Enter your assignment here..." class="form-control" id="text" name="text" rows="12" required></textarea>
-                        </div>
-                        {% endif %}
                         
                         <!-- Submit Button -->
                         <button type="submit" class="btn btn-primary btn-lg">Submit</button>

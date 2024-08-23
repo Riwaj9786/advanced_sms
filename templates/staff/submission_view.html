@@ -36,9 +36,25 @@
                     {% if assignment.description %}
                     <div>
                         <h5 class="mt-5">Assignment Description</h5>
-                        <p>{{ assignment.description }}</p>
+                        <p>{{ assignment.description|linebreaks }}</p>
                     </div>
                     {% endif %}
+                    {% if assignment_file %}
+                    <div class="container row">
+                        <div class="col-12 d-flex justify-content-start align-items-center flex-wrap">
+                            {% for file in assignment_file %}
+                            <div class="card text-center m-2 shadow-sm" style="width: 120px; border: none;">
+                                <div class="card-body">
+                                    <a href="{{ file.file.url }}" target="_blank" class="text-decoration-none" data-bs-toggle="tooltip" data-bs-placement="top" title="View Document">
+                                        <img src="{% static 'images/logo/document_icon.gif' %}" alt="Document" style="width: 60px; height: auto;">
+                                    </a>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% endif %}
+                                        
                 </div>
             </div>
         </div>
@@ -67,12 +83,8 @@
                             <tr>
                                 <td>{{ submission.student.first_name }} {{ submission.student.last_name }}</td>
                                 <td>
-                                    {% if assignment.accepted_file_type == 'pdf' %}
                                         <a href="{{ submission.file.url }}" target="_blank">View PDF</a>
-                                    {% elif assignment.accepted_file_type == 'text' %}
-                                        <!-- Button to open the modal -->
-                                        <a href="{{ submission.text.url }}" target="_blank">View Text</a>
-                                    {% endif %}
+
                                 </td>
                                 <td>{{ submission.submitted_at|date:"d-M-Y H:i" }}</td>
                                 <td>

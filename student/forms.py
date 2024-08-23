@@ -1,5 +1,5 @@
 from django import forms
-from student.models import User, Assignment, ProgramCourse, Student
+from student.models import User, Assignment, ProgramCourse, Student, AssignmentFile
 from django.contrib.auth.forms import UserCreationForm
 
 class RegisterForm(forms.ModelForm):
@@ -29,16 +29,27 @@ class LoginForm(forms.Form):
 class AssignmentForm(forms.ModelForm):
     class Meta:
         model = Assignment
-        fields = ['title', 'description', 'deadline', 'worth', 'research_files', 'accepted_file_type', 'assigned_class']
+        fields = ['title', 'description', 'deadline', 'worth', 'assigned_class']
 
     def __init__(self, *args, **kwargs):
         teacher = kwargs.pop('teacher', None)
         super().__init__(*args, **kwargs)
         if teacher:
             self.fields['assigned_class'].queryset = ProgramCourse.objects.filter(teacher=teacher)
-        for field in self.fields.values():
-            field.widget.attrs.update({'class': 'form-control'})
-        self.fields['deadline'].widget = forms.DateInput(attrs={'type': 'date', 'class': 'form-control'})
+
+    def save(self, commit=True):
+        assignment = super().save(commit=False)
+        if commit:
+            assignment.save()
+            # Save files
+            if 'research_files' in self.files:
+                for file in self.files.getlist('research_files'):
+                    assignment_file = AssignmentFile(file=file)
+                    assignment_file.save()
+                    assignment.research_files.add(assignment_file)
+            assignment.save()
+        return assignment
+    
 
 
 class StudentRegistrationForm(UserCreationForm):

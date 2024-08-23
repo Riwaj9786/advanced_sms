@@ -5,6 +5,7 @@ from django.contrib.auth.models import User, AbstractUser
 from django.conf import settings
 from django.utils.text import slugify
 from django.core.validators import MinValueValidator, MaxValueValidator
+from django.utils import timezone
 
 class Program(models.Model):
     program_id = models.CharField(max_length=12, unique=True)
@@ -94,6 +95,7 @@ class ProgramCourse(models.Model):
     course = models.ForeignKey(Course, on_delete=models.CASCADE)
     semester = models.ForeignKey(Semester, on_delete=models.CASCADE)
     teacher = models.ForeignKey(User, on_delete=models.RESTRICT)
+    credit_hour = models.FloatField(null=True, blank=True, validators=[MinValueValidator(0), MaxValueValidator(8)])
 
     def __str__(self):
         return f"{self.program.program_name} - {self.course.course_name}"
@@ -121,17 +123,12 @@ class Marks(models.Model):
 
 # Model for Assignment
 class Assignment(models.Model):
-    ACCEPTED_FILE_TYPES = [
-        ('text', 'Text File'),
-        ('pdf', 'PDF File'),
-    ]
-
     title = models.CharField(max_length=255)
     description = models.TextField(null=True, blank=True)
-    deadline = models.DateTimeField()
+    deadline = models.DateTimeField(default=timezone.now)
     worth = models.IntegerField()
     research_files = models.ManyToManyField('AssignmentFile', blank=True)  # Multiple files can be linked here
-    accepted_file_type = models.CharField(max_length=10, choices=ACCEPTED_FILE_TYPES)
+    accepted_file_type = models.CharField(max_length=10, null=True)
     assigned_class = models.ForeignKey(ProgramCourse, on_delete=models.CASCADE, related_name='assignments')
     created_by = models.ForeignKey(User, null=True, on_delete=models.CASCADE)
     plagiarism_checked = models.BooleanField(default=False)  # Plagiarism flag
@@ -167,6 +164,8 @@ class Submission(models.Model):
 
     def __str__(self):
         return f"{self.student.username} - {self.assignment.title}"
+    
+    
 
 class Plagiarism(models.Model):
     submission_to_check = models.ForeignKey(Submission, on_delete=models.CASCADE, related_name='submissions_plagiarism_of')

@@ -158,7 +158,8 @@
                 href="{% url 'students:student_assignments' %}">
                 <i class="fas fa-tasks me-2"></i> Assignments
             </a>
-            <a class="nav-link text-light mb-2" href="#">
+            <a class="nav-link text-light mb-2 {% if request.resolver_match.url_name == 'student_marks' %}active{% endif %}" 
+                href="{% url 'students:student_marks' pk=user.pk %}">
                 <i class="fas fa-book me-2"></i> Marks
             </a>
             <a class="nav-link text-light mt-auto" href="#">

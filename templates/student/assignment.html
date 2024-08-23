@@ -41,7 +41,6 @@
         <div class="row g-4">
             {% if inactive_assignments %}
                 {% for assignment in inactive_assignments %}
-                <a class="text-decoration-none" href="{% url 'students:assignment_view' pk=assignment.pk %}">
                     <div class="col-md-6 col-lg-4">
                         <div class="card h-100 shadow-sm border-secondary">
                             <div class="card-body">
@@ -55,7 +54,6 @@
                             </div>
                         </div>
                     </div>
-                </a>
                 {% endfor %}
             {% else %}
                 <div class="alert alert-secondary text-center" role="alert">

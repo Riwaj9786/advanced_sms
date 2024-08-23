@@ -3,7 +3,7 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.http import HttpResponse, HttpResponseForbidden
 from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth.decorators import login_required
-from student.models import Student, ProgramCourse, Course, Semester, User, Program, Marks, Assignment, Submission, Plagiarism
+from student.models import Student, ProgramCourse, Course, AssignmentFile, Semester, User, Program, Marks, Assignment, Submission, Plagiarism
 from student.forms import RegisterForm, LoginForm, AssignmentForm
 from django.contrib.auth.hashers import make_password
 from datetime import datetime
@@ -12,8 +12,8 @@ from django.conf import settings
 from django.core.files.storage import FileSystemStorage
 from django.urls import reverse
 from student import utils
+from django.utils import timezone
 
-# from glob import glob
 
 def home(request):
     if request.user.is_authenticated:
@@ -55,13 +55,15 @@ def user_register(request):
         if form.is_valid():
             user = form.save(commit=False)
             email = form.cleaned_data.get('email')
+            first_name = form.cleaned_data.get('first_name')
+            last_name = form.cleaned_data.get('last_name')
             date_of_birth = form.cleaned_data.get('date_of_birth')
             is_student = form.cleaned_data.get('is_student')
             user.password = make_password(form.cleaned_data['password'])
 
             if is_student:
                 try:
-                    student = Student.objects.get(email=email, date_of_birth=date_of_birth)
+                    student = Student.objects.get(email=email, first_name=first_name, last_name=last_name,  date_of_birth=date_of_birth)
                     if student.user:
                         form.add_error(None, "This student is already linked to a user account.")
                     else:
@@ -199,6 +201,7 @@ def classes_view(request, pk):
         'program_courses': program_courses
     })
 
+
 @login_required
 def assignments(request, pk):
     teacher = get_object_or_404(User, pk=pk)
@@ -207,20 +210,39 @@ def assignments(request, pk):
         return HttpResponseForbidden("You are not authorized!")
 
     program_courses = ProgramCourse.objects.filter(teacher=teacher)
-    assignments = Assignment.objects.filter(assigned_class__teacher=teacher, deadline__gte=datetime.now())
+    assignments = Assignment.objects.filter(assigned_class__teacher=teacher, deadline__gte=timezone.now())
     inactive_assignments = Assignment.objects.filter(
         assigned_class__in=program_courses,
-        deadline__lte=datetime.now()
+        deadline__lte=timezone.now()
     ).order_by('-deadline')
 
     if request.method == 'POST':
-        form = AssignmentForm(request.POST, teacher=teacher)
+        form = AssignmentForm(request.POST, request.FILES, teacher=teacher)
         if form.is_valid():
             assignment = form.save(commit=False)
             assignment.assigned_class = form.cleaned_data['assigned_class']
             assignment.created_by = request.user
             assignment.save()
+
+            # Handle multiple file uploads
+            if request.FILES.getlist('research_files'):
+                for file in request.FILES.getlist('research_files'):
+                    if file:  # Ensure file is not empty
+                        assignment_file = AssignmentFile(file=file)
+                        assignment_file.save()
+                        assignment.research_files.add(assignment_file)
+            
             return redirect('students:assignments', pk=teacher.pk)
+        else:
+            return render(request, 'staff/assignment.html', {
+                'teacher': teacher,
+                'program_courses': program_courses,
+                'form': form,
+                'assignments': assignments,
+                'inactive_assignments': inactive_assignments,
+                'error': "Form is invalid. Please check your inputs."
+            })
+
     else:
         form = AssignmentForm(teacher=teacher)
 
@@ -231,6 +253,7 @@ def assignments(request, pk):
         'assignments': assignments,
         'inactive_assignments': inactive_assignments
     })
+
 
 @login_required
 def delete_assignment(request, pk):
@@ -246,10 +269,12 @@ def student_assignment_view(request):
     if user.is_student:
         student = Student.objects.get(user=user)
         program_course = ProgramCourse.objects.filter(program=student.program, semester=student.semester)
+        
         assignments = Assignment.objects.filter(
             assigned_class__in=program_course,
             deadline__gte=datetime.now()
         ).order_by('deadline')
+
         inactive_assignments = Assignment.objects.filter(
             assigned_class__in=program_course,
             deadline__lte=datetime.now()
@@ -281,7 +306,6 @@ def assignment_view(request, pk):
         submission, created = Submission.objects.get_or_create(assignment=assignment, student=request.user)
 
         if request.method == "POST":
-            if assignment.accepted_file_type == "pdf":
                 if 'file' in request.FILES:
                     file = request.FILES['file']
                     # Replace existing file if already submitted
@@ -299,40 +323,6 @@ def assignment_view(request, pk):
                 else:
                     messages.error(request, "Please upload a valid PDF file.")
 
-            elif assignment.accepted_file_type == "text":
-                text_content = request.POST.get('text')
-                if text_content:
-                    # Define the directory for this assignment
-                    assignment_directory = os.path.join(settings.MEDIA_ROOT, f"submissions/text/assignment_{assignment.pk}/")
-                    
-                    # Create the directory if it doesn't exist
-                    if not os.path.exists(assignment_directory):
-                        os.makedirs(assignment_directory)
-
-                    # File path within the assignment directory
-                    file_name = f"{request.user.username}_assignment_{assignment.pk}.txt"
-                    file_path = os.path.join(assignment_directory, file_name)
-
-                    # Replace existing text file if already submitted
-                    if submission.file and submission.file.name != file_path:
-                        # Delete the old file
-                        fs = FileSystemStorage()
-                        fs.delete(submission.file.name)
-
-                    # Save the new file
-                    with open(file_path, 'w') as f:
-                        f.write(text_content)
-
-                    submission.file = file_path.replace(settings.MEDIA_ROOT + '/', '')  # store relative path
-                    submission.submitted_at = datetime.now()
-                    submission.is_submitted = True
-                    submission.is_checked = True
-                    submission.save()
-                    messages.success(request, "Your assignment has been submitted successfully!")
-                    return redirect('students:student_assignments')
-                else:
-                    messages.error(request, "Please enter the text for your assignment.")
-
         return render(request, 'student/assignment_view.html', {'assignment': assignment, 'submission': submission})
     else:
         # Handle non-student users
@@ -346,10 +336,12 @@ def submission_view(request, pk):
     if user.is_staff:
         assignment = get_object_or_404(Assignment, pk=pk)
         submissions = Submission.objects.filter(assignment=assignment)
+        assignment_file = assignment.research_files.all()
 
         return render(request, 'staff/submission_view.html', {
             'assignment': assignment,
-            'submissions': submissions
+            'submissions': submissions,
+            'assignment_file': assignment_file
         })
 
     else:
@@ -529,3 +521,36 @@ def check_plagiarism(request, pk):
 
     # return render(request, 'student/assignment_view.html', {'assignment': assignment, 'submission': submission})
     return submission_view(request, pk)
+
+
+
+@login_required
+def student_marks_page(request, pk):
+    # Get the user and corresponding student object
+    user = get_object_or_404(User, pk=pk)
+    student = get_object_or_404(Student, user=user)
+
+    # Retrieve all marks for the student
+    marks = Marks.objects.filter(student=student)
+
+    # Retrieve all semesters (for filtering) associated with the student's program
+    semesters = Semester.objects.all().distinct().order_by('semester')
+
+    selected_semester = None
+    filtered_marks = marks 
+
+    # If the request method is POST, filter marks by the selected semester
+    if request.method == "POST":
+        semester_id = request.POST.get('semester_id')
+        if semester_id:
+            selected_semester = get_object_or_404(Semester, pk=semester_id)
+            filtered_marks = marks.filter(course__programcourse__semester=selected_semester)
+
+    return render(request, 'student/marks.html', {
+        'student': student,
+        'semesters': semesters,
+        'selected_semester': selected_semester,
+        'filtered_marks': filtered_marks,
+        'marks': marks,
+    })
+

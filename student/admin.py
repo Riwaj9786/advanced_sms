@@ -1,6 +1,6 @@
 from django.contrib import admin
-from .models import User, Program, Student, Submission, Plagiarism, Course, ProgramCourse, Marks
-from .admin_site import custom_admin_site  # Import from the correct location
+from .models import User, Program, Student, AssignmentFile, Submission, Course, ProgramCourse, Marks, Assignment
+from .admin_site import custom_admin_site  
 from django import forms
 
 class ProgramCourseForm(forms.ModelForm):
@@ -26,7 +26,8 @@ custom_admin_site.register(User, CustomUserAdmin)
 custom_admin_site.register(Program)
 custom_admin_site.register(Student)
 custom_admin_site.register(Course)
-custom_admin_site.register(Marks)
+# custom_admin_site.register(Marks)
 custom_admin_site.register(Submission)
-custom_admin_site.register(Plagiarism)
+# custom_admin_site.register(AssignmentFile)
 custom_admin_site.register(ProgramCourse, ProgramCourseAdmin)
+# custom_admin_site.register(Assignment)

@@ -1,13 +1,87 @@
 <!DOCTYPE html>
-
-{% extends 'student/marks.html' %}
+{% extends "student/index.html" %}
 
 {% load static %}
 
 {% block marks %}
 <div class="container mt-5">
-    <div>
-        <div class="bg-primary"></div>
+    <div class="row justify-content-center">
+        <div class="col-lg-8 col-md-10">
+            <!-- Student's Name -->
+                <div class="card mb-3 border-1">
+                    <div class="card-body">
+                        <div class="row align-items-center">
+                            <!-- Profile Picture or Initials -->
+                            <div class="col-md-3 text-center">
+                                <div class="rounded-circle bg-success d-flex justify-content-center align-items-center"
+                                    style="width: 150px; height: 150px; font-size: 48px; font-weight: bold;">
+                                    <p class="text-white m-0">{{ student.first_name|slice:":1" }}{{ student.last_name|slice:":1" }}</p>
+                                </div>
+                            </div>
+                            <!-- Student Information -->
+                            <div class="col-md-6">
+                                <div class="p-3">
+                                    <h2 class="text-primary text-uppercase mb-2">{{ student.first_name }} {{ student.last_name }}</h2>
+                                    <p class="text-muted small mb-1"><i class="fas fa-id-badge me-2"></i>{{ student.registration_number }}</p>
+                                    <p class="text-muted small mb-1"><i class="fas fa-envelope me-2"></i>{{ student.email }}</p>
+                                    <p class="text-muted small mb-0"><i class="fas fa-book-open me-2"></i>{{ student.program.program_name }} | Semester {{ student.semester.semester }}</p>
+                                </div>
+                            </div>
+                            <!-- Status Badge -->
+                            <div class="col-md-3 text-center">
+                                <div class="p-3">
+                                    <h6 class="text-secondary mb-1">Status</h6>
+                                    <span class="badge bg-success p-2 fs-6">Student</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            <!-- Semester Selection Form -->
+            <form method="POST" class="mb-5">
+                {% csrf_token %}
+                <div class="input-group">
+                    <label class="input-group-text" for="semester">Select Semester:</label>
+                    <select name="semester_id" id="semester" class="form-select" onchange="this.form.submit()">
+                        <option value="">-- All Semesters --</option>
+                        {% for semester in semesters %}
+                            <option value="{{ semester.id }}" {% if selected_semester and semester.id == selected_semester.id %}selected{% endif %}>
+                                Semester: {{ semester.semester }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </form>
+
+            <!-- Marks Table -->
+            <div class="card shadow-sm">
+                <div class="card-body p-0">
+                    <table class="table table-hover mb-0">
+                        <thead class="table-primary">
+                            <tr>
+                                <th scope="col">Course</th>
+                                <th scope="col">Marks Obtained</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% if filtered_marks %}
+                                {% for mark in filtered_marks %}
+                                    <tr>
+                                        <td>{{ mark.course.course_name }}</td>
+                                        <td>{{ mark.marks_obtained }}</td>
+                                    </tr>
+                                {% endfor %}
+                            {% else %}
+                                <tr>
+                                    <td colspan="2" class="text-center text-muted">No marks available for the selected semester.</td>
+                                </tr>
+                            {% endif %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 {% endblock %}
